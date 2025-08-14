@@ -41,21 +41,63 @@ interface propertyListParams {
   sensor_type?: string // 传感器型号
 }
 
-interface AddPropertyParams_Building {
-  property_id: string // 资产编号
-  name: string // 楼宇名称
-  number?: string // 楼宇编号
-  address?: string // 楼宇地址
-  is_used?: string // 楼宇状态
-  description?: string // 楼宇描述
+interface BindPropertyListParams {
+  property_id?: string
+  property_type?: string
 }
 
+export interface BindPropertyListItem {
+  property_id: string
+  name: string
+}
+
+export interface SensorKindItem {
+  name: string
+  kind: string
+}
+
+export interface SensorTypeItem {
+  name: string
+  type: string
+}
+
+// 资产列表
 export function getPropertyList(params: propertyListParams): Promise<PropertyListResponse> {
   return request.get(urls.property.propertyList, {
     params,
   })
 }
 
-export function addProperty(data: AddPropertyParams_Building) {
+// 新增资产
+export function addProperty(data: any) {
   return request.post(urls.property.addProperty, data)
+}
+
+// 获取可绑定的资产
+export function getBindPropertyList(params: BindPropertyListParams): Promise<BindPropertyListItem[]> {
+  return request.get(urls.property.getBindPropertyList, {
+    params,
+  })
+}
+
+// 获取传感器种类
+export function getSensorKindList(): Promise<SensorKindItem[]> {
+  return request.get(urls.property.getSensorKindList)
+}
+
+// 获取传感器类型
+export function getSensorTypeList(): Promise<SensorTypeItem[]> {
+  return request.get(urls.property.getSensorTypeList)
+}
+
+export function getPropertyDetails(property_id: string) {
+  return request.get(urls.property.getPropertyDetails, {
+    params: {
+      property_id,
+    },
+  })
+}
+
+export function updateProperty(data: any) {
+  return request.post(urls.property.updateProperty, data)
 }

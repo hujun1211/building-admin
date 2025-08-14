@@ -56,8 +56,8 @@ export function AppSidebar() {
       <Sidebar collapsible="icon">
         <SidebarHeader className="bg-white">
           <div className="flex h-10 items-center justify-center gap-5">
-            <Atom />
-            <span className={cn('text-lg font-bold whitespace-nowrap', { hidden: state === 'collapsed' })}>智慧楼宇管理系统</span>
+            {/* <Atom /> */}
+            <span className={cn('text-lg font-bold whitespace-nowrap', { hidden: state === 'collapsed' })}>智慧楼宇能源管理系统</span>
           </div>
         </SidebarHeader>
         <SidebarContent className="bg-white">

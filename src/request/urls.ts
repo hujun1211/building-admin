@@ -53,5 +53,18 @@ export const urls = {
   property: {
     propertyList: combineUrl('/propertypage/search_info'),
     addProperty: combineUrl('/propertypage/add_property'),
+    getBindPropertyList: combineUrl('/propertypage/get_binding_list'),
+    getSensorTypeList: combineUrl('/property/get_type_list'),
+    getSensorKindList: combineUrl('/property/get_kind_list'),
+    getPropertyDetails: combineUrl('/propertypage/get_property'),
+    updateProperty: combineUrl('/propertypage/update_property'),
+  },
+
+  control: {
+    getRegulationList: combineUrl('/controlpage/regulation/search_info'),
+    getManualList: combineUrl('/controlpage/manual/search_info'),
+
+    getManualOperateList: combineUrl('/property/get_operate_list'),
+    manualOperate: combineUrl('/controlpage/manual/operate'),
   },
 }

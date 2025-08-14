@@ -1,5 +1,5 @@
 import AccountManagement from '@/pages/account-management'
-import BuildingControl from '@/pages/building-control'
+import Control from '@/pages/control'
 import Home from '@/pages/home'
 import IntelligentEvaluation from '@/pages/intelligent-evaluation'
 import LogManagement from '@/pages/log-management'
@@ -24,9 +24,9 @@ const sidebarItems = [
   },
   {
     title: '楼宇管控',
-    path: '/building-control',
+    path: '/control',
     icon: 'building-2',
-    element: <BuildingControl />,
+    element: <Control />,
   },
   {
     title: '实时数据',
