@@ -1,0 +1,57 @@
+function combineAuthorityUrl(url: string) {
+  return `${import.meta.env.VITE_BASE_URL}${url}`
+}
+
+function combineUrl(url: string) {
+  return `${import.meta.env.VITE_BASE_URL_HOME}${url}`
+}
+
+export const urls = {
+  // 登录登出
+  login: {
+    login: combineAuthorityUrl('/authority/manage/user/login'),
+    logout: combineAuthorityUrl('/authority/manage/user/logout'),
+  },
+
+  // 首页
+  home: {
+    onlineUnit: combineUrl('/homepage/online_unit'),
+    alarmCount: combineUrl('/homepage/alarm_count'),
+    propertyCount: combineUrl('/homepage/property_count'),
+
+    vitality_day: combineUrl('/homepage/vitality_day'),
+    vitality_week: combineUrl('/homepage/vitality_week'),
+    vitality_month: combineUrl('/homepage/vitality_month'),
+
+    alarm: combineUrl('/homepage/alarm'),
+    propertyList: combineUrl('/homepage/property'),
+    sensor_kind: combineUrl('/homepage/sensor_kind'),
+  },
+
+  // 账号（用户）
+  account: {
+    accountTableList: combineAuthorityUrl('/authority/user/query/approved'),
+    roleUserList: combineAuthorityUrl('/authority/manager/role/user/list'),
+    accountPermission: combineAuthorityUrl('/authority/manager/permission/builder/list/task/all'),
+    accountCreate: combineAuthorityUrl('/authority/user/create'),
+    accountRoleUpdate: combineAuthorityUrl('/authority/manager/role/user/update'),
+    accountDelete: combineAuthorityUrl('/authority/user/delete'),
+    accountPasswordReset: combineAuthorityUrl('/authority/user/password/reset'),
+  },
+
+  // 角色
+  role: {
+    roleTableList: combineAuthorityUrl('/authority/manager/role/list'), // 分页
+    roleList: combineAuthorityUrl('/authority/manager/role/list/all'), // 不分页
+    roleCreate: combineAuthorityUrl('/authority/manager/role/add'),
+    roleDelete: combineAuthorityUrl('/authority/manager/role/delete'),
+    roleUpdate: combineAuthorityUrl('/authority/manager/role/update'),
+    rolePermission: combineAuthorityUrl('/authority/manager/permission/builder/list/contract/menu'),
+    rolePermissionUpdate: combineAuthorityUrl('/authority/manager/permission/role/update'),
+  },
+
+  property: {
+    propertyList: combineUrl('/propertypage/search_info'),
+    addProperty: combineUrl('/propertypage/add_property'),
+  },
+}
