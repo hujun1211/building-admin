@@ -56,37 +56,37 @@ const addBuildingFormSchema = z.object({
   name: z.string().min(1, '楼宇名称不能为空'), // 楼宇名称
   number: z.string().optional(), // 楼宇编号
   address: z.string().optional(), // 楼宇地址
-  is_used: z.string().optional(), // 楼宇状态
+  is_used: z.string().min(1, '状态不能为空'), // 楼宇状态
   description: z.string().optional(), // 楼宇描述
 })
 
 const addSpaceFormSchema = z.object({
   property_id: z.string(), // 资产编号
-  property_bind_id: z.string().min(1, '绑定楼宇id不能为空'), // 绑定楼宇id
+  property_bind_id: z.string().min(1, '绑定楼宇不能为空'), // 绑定楼宇id
   name: z.string().min(1, '空间名称不能为空'), // 空间名称
   number: z.string().min(1, '空间编号不能为空'), // 编号
   floor: z.string().min(1, '楼层不能为空'), // 楼层
   type: z.string().optional(), // 类型
   ampere: z.string().optional(), // 电流
-  is_used: z.string().optional(), // 状态
+  is_used: z.string().min(1, '状态不能为空'), // 状态
   description: z.string().optional(), // 描述
 })
 
 const addTerminalFormSchema = z.object({
   property_id: z.string(), // 资产编号
-  property_bind_id: z.string().min(1, '绑定楼宇id不能为空'), // 绑定空间id
+  property_bind_id: z.string().min(1, '绑定空间不能为空'), // 绑定空间id
   number: z.string().min(1, '终端编号不能为空'), // 编号
   type: z.string().min(1, '终端型号不能为空'), // 型号
-  is_used: z.string().optional(), // 状态
+  is_used: z.string().min(1, '状态不能为空'), // 状态
   description: z.string().optional(), // 描述
 })
 
 const addSensorFormSchema = z.object({
   property_id: z.string(), // 资产编号
-  property_bind_id: z.string().min(1, '绑定楼宇id不能为空'), // 绑定终端id
+  property_bind_id: z.string().min(1, '绑定终端不能为空'), // 绑定终端id
   kind: z.string().min(1, '终端种类不能为空'), // 种类
   type: z.string().min(1, '终端型号不能为空'), // 型号
-  is_used: z.string().optional(), // 状态
+  is_used: z.string().min(1, '状态不能为空'), // 状态
   description: z.string().optional(), // 描述
 })
 
@@ -182,7 +182,7 @@ export default function PropertyPage() {
       key: 'operation',
       align: 'center',
       render: (_, record: any) => (
-        <Button variant="link" className="cursor-pointer" onClick={() => handleOpenEditDialog(record)}>编辑</Button>
+        <Button variant="link" className="cursor-pointer text-blue-500" onClick={() => handleOpenEditDialog(record)}>编辑</Button>
       ),
     },
   ]
@@ -199,7 +199,7 @@ export default function PropertyPage() {
   }
 
   // 请求表格数据
-  const { data: propertyData, isPending: isLoading, refetch } = useQuery({
+  const { data: propertyData, isPending: isLoading, refetch, isError, error } = useQuery({
     queryKey: ['propertyList', pageParams.current, pageParams.pageSize, searchValues],
     queryFn: () => getPropertyList({
       page: pageParams.current,
@@ -207,6 +207,12 @@ export default function PropertyPage() {
       ...searchValues,
     }),
   })
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message)
+    }
+  }, [isError])
+  // 设置分页
   useEffect(() => {
     if (propertyData?.page?.totalSize) {
       setPageParams(prev => ({
@@ -240,9 +246,11 @@ export default function PropertyPage() {
   const propertyType = searchForm.watch('property_type')
   // 搜索表单提交
   function onSearchFormSubmit(values: z.infer<typeof searchFormSchema>) {
-    console.log(values)
     setSearchValues(values)
-    refetch()
+    setPageParams({
+      ...pageParams,
+      current: 1,
+    })
   }
 
   /** 新增资产 */
@@ -260,7 +268,6 @@ export default function PropertyPage() {
   function handleOpenEditDialog(record: any) {
     setAddOrEdit('edit')
     setPropertyDialogOpen(true)
-    console.log(record)
     if (record.property_id.startsWith('LY')) {
       setAddPropertySelectValue('building')
       getPropertyDetailsMutate(record.property_id, {
@@ -557,7 +564,9 @@ export default function PropertyPage() {
   }
   // 确定新增资产
   function handleAddProperty() {
-    // debugger
+    if (!addPropertySelectValue) {
+      toast.info('请选择资产类型')
+    }
     if (addPropertySelectValue === 'building') {
       addBuildingForm.handleSubmit(onAddPropertyFormSubmit)()
     }
@@ -572,7 +581,53 @@ export default function PropertyPage() {
     }
   }
 
-  /** 编辑资产 */
+  function onDialogOpenChange(open: boolean) {
+    setPropertyDialogOpen(open)
+    if (!open) {
+      setAddPropertySelectValue('')
+      addBuildingForm.reset({
+        property_id: 'LY9999',
+        name: '',
+        number: '',
+        address: '',
+        is_used: '',
+        description: '',
+      })
+      addSpaceForm.reset(
+        {
+          property_id: 'KJ9999',
+          property_bind_id: '',
+          name: '',
+          number: '',
+          floor: '',
+          type: '',
+          ampere: '',
+          is_used: '',
+          description: '',
+        },
+      )
+      addTerminalForm.reset(
+        {
+          property_id: 'ZD9999',
+          property_bind_id: '',
+          number: '',
+          type: '',
+          is_used: '',
+          description: '',
+        },
+      )
+      addSensorForm.reset(
+        {
+          property_id: 'CGQ9999',
+          property_bind_id: '',
+          kind: '',
+          type: '',
+          is_used: '',
+          description: '',
+        },
+      )
+    }
+  }
 
   return (
     <div className="p-5">
@@ -863,7 +918,7 @@ export default function PropertyPage() {
         onChange={handlePaginationChange}
         className="mt-2"
       />
-      <Dialog open={propertyDialogOpen} onOpenChange={value => setPropertyDialogOpen(value)}>
+      <Dialog open={propertyDialogOpen} onOpenChange={onDialogOpenChange}>
         <DialogContent className="max-w-180!" showCloseButton={false}>
           <DialogClose className="absolute top-3 right-3 flex cursor-pointer items-center justify-center rounded-full bg-gray-200 p-1 hover:bg-gray-300 ">
             <X className="h-4 w-4" />
@@ -885,7 +940,7 @@ export default function PropertyPage() {
                         value={addPropertySelectValue}
                       >
                         <SelectTrigger className="w-50">
-                          <SelectValue placeholder="请先选择资产类型" />
+                          <SelectValue placeholder="请先选择资产类" />
                         </SelectTrigger>
                         <SelectContent>
                           {propertyTypeSelectOptions.map(option => (
@@ -954,28 +1009,27 @@ export default function PropertyPage() {
                         control={addBuildingForm.control}
                         name="is_used"
                         render={({ field }) => (
-                          <FormItem className="flex items-center gap-5">
+                          <FormItem className="relative flex items-center gap-5">
                             <FormLabel>楼宇状态</FormLabel>
                             <div className="flex flex-col">
-                              <FormControl>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger className="w-80 bg-white">
-                                      <SelectValue placeholder="请选择楼宇使用状态" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {buildingIsUsedSelectOptions.map(option => (
-                                      <SelectItem
-                                        key={option.value}
-                                        value={option.value}
-                                      >
-                                        {option.label}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="w-80 bg-white">
+                                    <SelectValue placeholder="请选择楼宇使用状态" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {buildingIsUsedSelectOptions.map(option => (
+                                    <SelectItem
+                                      key={option.value}
+                                      value={option.value}
+                                    >
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage className="absolute bottom-0 translate-y-full" />
                             </div>
                           </FormItem>
                         )}
@@ -1080,7 +1134,7 @@ export default function PropertyPage() {
                         control={addSpaceForm.control}
                         name="is_used"
                         render={({ field }) => (
-                          <FormItem className="flex items-center gap-5">
+                          <FormItem className="relative flex items-center gap-5">
                             <FormLabel>空间状态</FormLabel>
                             <div className="flex flex-col">
                               <Select onValueChange={field.onChange} value={field.value}>
@@ -1100,7 +1154,7 @@ export default function PropertyPage() {
                                   ))}
                                 </SelectContent>
                               </Select>
-                              <FormMessage />
+                              <FormMessage className="absolute bottom-0 translate-y-full" />
                             </div>
                           </FormItem>
                         )}
@@ -1218,7 +1272,7 @@ export default function PropertyPage() {
                         control={addTerminalForm.control}
                         name="is_used"
                         render={({ field }) => (
-                          <FormItem className="flex items-center gap-5">
+                          <FormItem className="relative flex items-center gap-5">
                             <FormLabel>终端状态</FormLabel>
                             <div className="flex flex-col">
                               <Select onValueChange={field.onChange} value={field.value}>
@@ -1238,6 +1292,7 @@ export default function PropertyPage() {
                                   ))}
                                 </SelectContent>
                               </Select>
+                              <FormMessage className="absolute bottom-0 translate-y-full" />
                             </div>
                           </FormItem>
                         )}
@@ -1355,7 +1410,7 @@ export default function PropertyPage() {
                         control={addSensorForm.control}
                         name="is_used"
                         render={({ field }) => (
-                          <FormItem className="flex items-center gap-5">
+                          <FormItem className="relative flex items-center gap-5">
                             <FormLabel>传感器状态</FormLabel>
                             <div className="flex flex-col">
                               <Select onValueChange={field.onChange} value={field.value}>
@@ -1375,6 +1430,7 @@ export default function PropertyPage() {
                                   ))}
                                 </SelectContent>
                               </Select>
+                              <FormMessage className="absolute bottom-0 translate-y-full" />
                             </div>
                           </FormItem>
                         )}

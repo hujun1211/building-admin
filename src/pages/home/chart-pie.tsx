@@ -11,30 +11,21 @@ import {
   ChartTooltipContent,
 } from '@/shadcn/ui/chart'
 
-const chartConfig = {
-  energy: {
-    label: '能源设备',
-    color: '#5D85FC',
-  },
-  environment: {
-    label: '环境设备',
-    color: '#80C9CB',
-  },
-  voice: {
-    label: '音频设备',
-    color: '#D7935C',
-  },
-  security: {
-    label: '安防设备',
-    color: '#C388FD',
-  },
-}
-
 export function ChartPie() {
   const { data: rawData } = useQuery({
     queryKey: ['deviceCategory'],
     queryFn: getDeviceCategory,
   })
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF']
+
+  const chartConfig = rawData?.reduce((acc, item, index) => {
+    acc[item.kind] = {
+      label: item.kind,
+      color: COLORS[index % COLORS.length],
+    }
+    return acc
+  }, {})
 
   const chartData = rawData?.map(item => ({
     ...item,
@@ -43,14 +34,13 @@ export function ChartPie() {
 
   return (
     <ChartContainer
-      config={chartConfig}
+      config={chartConfig || {}}
     >
-      <PieChart>
+      <PieChart className="mt-5">
         <ChartTooltip
           cursor={false}
           content={<ChartTooltipContent />}
         />
-        <ChartLegend content={<ChartLegendContent />} verticalAlign="bottom" />
         <Pie
           data={chartData}
           dataKey="count"
@@ -60,7 +50,10 @@ export function ChartPie() {
           strokeWidth={5}
           cx="50%"
           cy="50%"
+          labelLine={false}
+          label
         />
+        <ChartLegend className="text-base" content={<ChartLegendContent />} verticalAlign="bottom" />
       </PieChart>
     </ChartContainer>
   )

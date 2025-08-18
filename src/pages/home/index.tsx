@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { getAlarm, getAlarmCount, getOnlineUnit, getPropertyCount } from '@/request/home'
+import { Button } from '@/shadcn/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/shadcn/ui/tabs'
 import { ChartLine } from './chart-line'
@@ -119,7 +121,12 @@ export default function HomePage() {
       <div className="mt-5 grid h-100 grid-cols-3 gap-5">
         <Card className="col-span-2 h-full border-gray-100/50">
           <CardHeader>
-            <CardTitle>楼宇资产分布</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>楼宇资产分布</CardTitle>
+              <Button variant="link" className="text-blue-500">
+                <Link to="/property">新增资产</Link>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <BuildingTable />

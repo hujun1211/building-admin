@@ -62,8 +62,17 @@ export const urls = {
 
   control: {
     getRegulationList: combineUrl('/controlpage/regulation/search_info'),
-    getManualList: combineUrl('/controlpage/manual/search_info'),
 
+    getMonitorPropertyList: combineUrl('/controlpage/regulation/get_monitor_property_list'),
+    getControlPropertyList: combineUrl('/controlpage/regulation/get_control_property_list'),
+    getFieldSelectList: combineUrl('/property/get_param_list'),
+    getTriggerSelectList: combineUrl('/controlpage/regulation/get_trigger_list'),
+
+    addRegulation: combineUrl('/controlpage/regulation/add'),
+    updateRegulation: combineUrl('/controlpage/regulation/update'),
+    getRegulationDetails: combineUrl('/controlpage/regulation/get_regulation'),
+
+    getManualList: combineUrl('/controlpage/manual/search_info'),
     getManualOperateList: combineUrl('/property/get_operate_list'),
     manualOperate: combineUrl('/controlpage/manual/operate'),
   },

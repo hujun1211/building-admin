@@ -107,7 +107,7 @@ export function AppSidebar() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <LogOut className="mr-2 inline" />
-                    <span onClick={handleLogout}>退出登录</span>
+                    <div onClick={handleLogout} className="w-full cursor-pointer">退出登录</div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

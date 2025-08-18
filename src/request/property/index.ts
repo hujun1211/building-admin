@@ -49,6 +49,9 @@ interface BindPropertyListParams {
 export interface BindPropertyListItem {
   property_id: string
   name: string
+  // 传感器参数
+  kind?: string
+  type?: string
 }
 
 export interface SensorKindItem {

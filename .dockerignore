@@ -1,0 +1,40 @@
+# 忽略 node_modules 目录
+**/node_modules/
+
+# 忽略日志文件
+*.log
+logs/
+
+# 忽略本地开发的构建产物
+**/dist/
+**/build/
+
+# 忽略环境变量配置文件
+**/.env.local
+**/.env.*.local
+
+# 忽略 Git 相关文件
+.git/
+.gitignore
+
+# 忽略本地编辑器配置文件
+.vscode/
+.idea/
+
+# 忽略测试覆盖率和报告文件
+coverage/
+*.lcov
+
+# 忽略临时文件
+*.swp
+*.tmp
+.DS_Store
+
+# 忽略本地文档
+*.md
+README.md
+
+.next
+Dockerfile
+.dockerignore
+docker-compose.yml

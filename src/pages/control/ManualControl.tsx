@@ -1,7 +1,8 @@
 import type { ManualOperateParams } from '@/request/control'
+import type { PaginationType } from '@/types'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Table } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { getManualList, getManualOperateList, manualOperate } from '@/request/control'
 import { Badge } from '@/shadcn/ui/badge'
@@ -88,13 +89,20 @@ export default function ManualControl() {
       render: (_: any, record: any) => {
         return (
           <DropdownMenu onOpenChange={value => handleOperateClick(value, record.property_id)}>
-            <DropdownMenuTrigger>控制</DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuTrigger>
+              <Button variant="link" className="cursor-pointer text-blue-500">操作</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              side="left"
+              sideOffset={-5}
+              align="start"
+              alignOffset={20}
+            >
               {
                 controlDropDownItems.map((item) => {
                   return (
                     <DropdownMenuItem key={item}>
-                      <div className="w-full" onClick={() => handleOperate({ property_id: record.property_id, control: item })}>
+                      <div className="w-full  cursor-pointer text-center" onClick={() => handleOperate({ property_id: record.property_id, control: item })}>
                         {item}
                       </div>
                     </DropdownMenuItem>
@@ -108,11 +116,38 @@ export default function ManualControl() {
     },
   ]
 
-  // 请求表格数据
-  const { data: manualList, isPending: isLoading, refetch } = useQuery({
-    queryKey: ['getManualList'],
-    queryFn: () => getManualList(),
+  // 表格分页
+  const [pageParams, setPageParams] = useState<PaginationType>({
+    current: 1,
+    pageSize: 5,
+    showSizeChanger: false,
   })
+  function handlePaginationChange(pagination: PaginationType) {
+    setPageParams(pagination)
+  }
+
+  // 请求表格数据
+  const { data: manualList, isPending: isLoading, refetch, isError, error } = useQuery({
+    queryKey: ['getManualList', pageParams.current, pageParams.pageSize],
+    queryFn: () => getManualList({
+      page: pageParams.current,
+      page_size: pageParams.pageSize,
+    }),
+  })
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message)
+    }
+  }, [isError])
+  // 设置分页
+  useEffect(() => {
+    if (manualList?.page?.totalSize) {
+      setPageParams(prev => ({
+        ...prev,
+        total: manualList.page.totalSize,
+      }))
+    }
+  }, [manualList])
 
   // 获取操作列表
   const { mutate: getManualOperateListMutate } = useMutation({
@@ -153,6 +188,8 @@ export default function ManualControl() {
       <Table
         dataSource={manualList?.manual || []}
         columns={columns}
+        pagination={pageParams}
+        onChange={handlePaginationChange}
         loading={isLoading}
         className="mt-2"
       />
