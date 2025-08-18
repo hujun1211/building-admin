@@ -8,9 +8,10 @@ function combineUrl(url: string) {
 
 export const urls = {
   // 登录登出
-  login: {
+  authority: {
     login: combineAuthorityUrl('/authority/manage/user/login'),
     logout: combineAuthorityUrl('/authority/manage/user/logout'),
+    tokenValidate: combineAuthorityUrl('/authority/token/validate'),
   },
 
   // 首页
@@ -50,6 +51,7 @@ export const urls = {
     rolePermissionUpdate: combineAuthorityUrl('/authority/manager/permission/role/update'),
   },
 
+  // 楼宇资产
   property: {
     propertyList: combineUrl('/propertypage/search_info'),
     addProperty: combineUrl('/propertypage/add_property'),
@@ -60,6 +62,7 @@ export const urls = {
     updateProperty: combineUrl('/propertypage/update_property'),
   },
 
+  // 楼宇管控
   control: {
     getRegulationList: combineUrl('/controlpage/regulation/search_info'),
 

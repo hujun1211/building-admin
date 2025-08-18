@@ -1,12 +1,12 @@
-import type { UserInfo } from '@/request/login'
+import type { UserInfo } from '@/request/authority'
 import { useMutation } from '@tanstack/react-query'
 import { jwtDecode } from 'jwt-decode'
-import { Atom, ChevronsUpDown, LogOut, User2 } from 'lucide-react'
+import { ChevronsUpDown, LogOut, User2 } from 'lucide-react'
 import { DynamicIcon } from 'lucide-react/dynamic'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { toast } from 'sonner'
-import { logout } from '@/request/login'
+import { logout, tokenValidate } from '@/request/authority'
 import { cn } from '@/shadcn/lib/utils'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shadcn/ui/dropdown-menu'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/shadcn/ui/sidebar'
@@ -19,24 +19,43 @@ export function AppSidebar() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const navigate = useNavigate()
 
+  const { mutate: tokenValidateMutate } = useMutation({
+    mutationFn: tokenValidate,
+  })
+
   useEffect(() => {
     const token = localStorage.getItem('token')
-    if (token) {
-      const decoded = jwtDecode(token)
-      setUserInfo(decoded as UserInfo)
-    }
-    else {
-      // 没有token
-      // TODO: token失效
+
+    if (!token) {
       navigate('/login')
+      return
     }
+
+    tokenValidateMutate(
+      undefined,
+      {
+        onSuccess: (data) => {
+          if (data && data.isValid) {
+            const decoded = jwtDecode(token)
+            setUserInfo(decoded as UserInfo)
+          }
+          else {
+            navigate('/login')
+          }
+        },
+        onError: (error) => {
+          navigate('/login')
+          toast.error(error.message)
+        },
+      },
+    )
   }, [])
 
-  const { mutate } = useMutation({
+  const { mutate: logoutMutate } = useMutation({
     mutationFn: logout,
   })
   function handleLogout() {
-    mutate(
+    logoutMutate(
       undefined,
       {
         onSuccess: () => {
@@ -44,7 +63,6 @@ export function AppSidebar() {
           navigate('/login')
         },
         onError: (error) => {
-          console.error(error.message)
           toast.error(error.message)
         },
       },
@@ -83,7 +101,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton className="h-10">
+                  <SidebarMenuButton className="h-10 cursor-pointer">
                     <User2 className="mr-5 inline" />
                     <span>{userInfo?.remark_name}</span>
                     <ChevronsUpDown className="ml-auto inline" />
@@ -100,7 +118,7 @@ export function AppSidebar() {
                       <User2 className="inline" />
                       <div>
                         <div className="font-bold">{userInfo?.remark_name}</div>
-                        <div>admin@example.com</div>
+                        <div>{userInfo?.mail}</div>
                       </div>
                     </div>
                   </DropdownMenuItem>

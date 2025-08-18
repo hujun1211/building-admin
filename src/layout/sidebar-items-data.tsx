@@ -1,8 +1,8 @@
 import AccountManagement from '@/pages/account-management'
 import Control from '@/pages/control'
 import Home from '@/pages/home'
-import IntelligentEvaluation from '@/pages/intelligent-evaluation'
 import LogManagement from '@/pages/log-management'
+import Personal from '@/pages/personal'
 import Property from '@/pages/property'
 import RealtimeData from '@/pages/realtime-data'
 import RoleManagement from '@/pages/role-management'
@@ -47,22 +47,22 @@ const sidebarItems = [
     element: <TeachingResearch />,
   },
   {
-    title: '智能评估',
-    path: '/intelligent-evaluation',
-    icon: 'star',
-    element: <IntelligentEvaluation />,
-  },
-  {
     title: '角色管理',
-    path: '/role-management',
+    path: '/role',
     icon: 'users',
     element: <RoleManagement />,
   },
   {
     title: '账号管理',
-    path: '/account-management',
+    path: '/account',
     icon: 'user-round',
     element: <AccountManagement />,
+  },
+  {
+    title: '个人中心',
+    path: '/personal',
+    icon: 'user',
+    element: <Personal />,
   },
   {
     title: '系统设置',
