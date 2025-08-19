@@ -1,3 +1,5 @@
+import { get } from 'node:http'
+
 function combineAuthorityUrl(url: string) {
   return `${import.meta.env.VITE_BASE_URL}${url}`
 }
@@ -44,7 +46,7 @@ export const urls = {
   role: {
     roleTableList: combineAuthorityUrl('/authority/manager/role/list'), // 分页
     roleList: combineAuthorityUrl('/authority/manager/role/list/all'), // 不分页
-    roleCreate: combineAuthorityUrl('/authority/manager/role/add'),
+    roleAdd: combineAuthorityUrl('/authority/manager/role/add'),
     roleDelete: combineAuthorityUrl('/authority/manager/role/delete'),
     roleUpdate: combineAuthorityUrl('/authority/manager/role/update'),
     rolePermission: combineAuthorityUrl('/authority/manager/permission/builder/list/contract/menu'),
@@ -78,5 +80,11 @@ export const urls = {
     getManualList: combineUrl('/controlpage/manual/search_info'),
     getManualOperateList: combineUrl('/property/get_operate_list'),
     manualOperate: combineUrl('/controlpage/manual/operate'),
+  },
+
+  // 实时数据
+  realtime: {
+    getOutlineInfo: combineUrl('/rtdpage/get_outline_info'),
+    getSensorList: combineUrl('/rtdpage/search_info'),
   },
 }

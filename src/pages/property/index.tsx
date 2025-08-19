@@ -444,6 +444,7 @@ export default function PropertyPage() {
             setPropertyDialogOpen(false)
             toast.success('新增楼宇成功')
             addBuildingForm.reset()
+            setAddPropertySelectValue('')
             refetch()
           },
           onError: (error) => {
@@ -457,6 +458,7 @@ export default function PropertyPage() {
             setPropertyDialogOpen(false)
             toast.success('编辑楼宇成功')
             addBuildingForm.reset()
+            setAddPropertySelectValue('')
             refetch()
           },
           onError: (error) => {
@@ -476,6 +478,7 @@ export default function PropertyPage() {
             setPropertyDialogOpen(false)
             toast.success('新增空间成功')
             addSpaceForm.reset()
+            setAddPropertySelectValue('')
             refetch()
           },
           onError: (error) => {
@@ -489,6 +492,7 @@ export default function PropertyPage() {
             setPropertyDialogOpen(false)
             toast.success('编辑空间成功')
             addSpaceForm.reset()
+            setAddPropertySelectValue('')
             refetch()
           },
           onError: (error) => {
@@ -508,6 +512,7 @@ export default function PropertyPage() {
             setPropertyDialogOpen(false)
             toast.success('新增终端成功')
             addTerminalForm.reset()
+            setAddPropertySelectValue('')
             refetch()
           },
           onError: (error) => {
@@ -521,6 +526,7 @@ export default function PropertyPage() {
             setPropertyDialogOpen(false)
             toast.success('编辑终端成功')
             addTerminalForm.reset()
+            setAddPropertySelectValue('')
             refetch()
           },
           onError: (error) => {
@@ -540,6 +546,7 @@ export default function PropertyPage() {
             setPropertyDialogOpen(false)
             toast.success('新增终端成功')
             addSensorForm.reset()
+            setAddPropertySelectValue('')
             refetch()
           },
           onError: (error) => {
@@ -553,6 +560,7 @@ export default function PropertyPage() {
             setPropertyDialogOpen(false)
             toast.success('编辑传感器成功')
             addSensorForm.reset()
+            setAddPropertySelectValue('')
             refetch()
           },
           onError: (error) => {
@@ -581,6 +589,7 @@ export default function PropertyPage() {
     }
   }
 
+  // 关闭弹窗
   function onDialogOpenChange(open: boolean) {
     setPropertyDialogOpen(open)
     if (!open) {
@@ -874,7 +883,7 @@ export default function PropertyPage() {
                     name="sensor_kind"
                     render={({ field }) => (
                       <FormItem className="flex items-center gap-3">
-                        <FormLabel>传感器种类</FormLabel>
+                        <FormLabel>传感器大类</FormLabel>
                         <div className="flex flex-col">
                           <FormControl>
                             <Input {...field} className="bg-white" />
@@ -889,7 +898,7 @@ export default function PropertyPage() {
                     name="sensor_type"
                     render={({ field }) => (
                       <FormItem className="flex items-center gap-3">
-                        <FormLabel>传感器类型</FormLabel>
+                        <FormLabel>传感器小类</FormLabel>
                         <div className="flex flex-col">
                           <FormControl>
                             <Input {...field} className="bg-white" />
@@ -1324,7 +1333,7 @@ export default function PropertyPage() {
                         name="kind"
                         render={({ field }) => (
                           <FormItem className="relative flex items-center gap-5">
-                            <FormLabel>传感器种类</FormLabel>
+                            <FormLabel>传感器大类</FormLabel>
                             <div className="flex flex-col">
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
@@ -1353,7 +1362,7 @@ export default function PropertyPage() {
                         name="type"
                         render={({ field }) => (
                           <FormItem className="relative flex items-center gap-5">
-                            <FormLabel>传感器类型</FormLabel>
+                            <FormLabel>传感器小类</FormLabel>
                             <div className="flex flex-col">
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>

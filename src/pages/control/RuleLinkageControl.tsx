@@ -103,7 +103,7 @@ export default function RuleLinkageControl() {
         <Button
           variant="link"
           className="cursor-pointer text-blue-500"
-          onClick={() => handleOpenEditDialog(record)}
+          onClick={() => handleOpenUpdateDialog(record)}
         >
           编辑
         </Button>
@@ -220,7 +220,7 @@ export default function RuleLinkageControl() {
     }
   }
 
-  function handleOpenDialog() {
+  function handleOpenAddDialog() {
     setAddOrUpdate('add')
     setDialogOpen(true)
     getSelectOption()
@@ -229,8 +229,8 @@ export default function RuleLinkageControl() {
   const { mutateAsync: getRegulationDetailsMutate } = useMutation({
     mutationFn: getRegulationDetails,
   })
-  async function handleOpenEditDialog(record: any) {
-    setAddOrUpdate('edit')
+  async function handleOpenUpdateDialog(record: any) {
+    setAddOrUpdate('update')
     setDialogOpen(true)
     await getSelectOption()
     const fieldRes = await getFieldSelectListMutateAsync(record.t_sensor_property_id)
@@ -253,8 +253,7 @@ export default function RuleLinkageControl() {
   const { mutate: updateRegulationMutate } = useMutation({
     mutationFn: updateRegulation,
   })
-  async function onSubmit(values: AddRegulationParams) {
-    console.log(values)
+  function onSubmit(values: AddRegulationParams) {
     if (addOrUpdate === 'add') {
       addRegulationMutate(values, {
         onSuccess: () => {
@@ -309,7 +308,7 @@ export default function RuleLinkageControl() {
   return (
     <div>
       <div>
-        <Button className="flex h-10 w-25 cursor-pointer items-center justify-center rounded-lg bg-blue-500 text-white hover:bg-blue-400" onClick={handleOpenDialog}>
+        <Button className="flex h-10 w-25 cursor-pointer items-center justify-center rounded-lg bg-blue-500 text-white hover:bg-blue-400" onClick={handleOpenAddDialog}>
           新增
         </Button>
       </div>
@@ -337,7 +336,7 @@ export default function RuleLinkageControl() {
             <Form {...roleForm}>
               <form className="space-y-7">
                 {
-                  addOrUpdate === 'edit'
+                  addOrUpdate === 'update'
                     ? (
                         <FormField
                           control={roleForm.control}

@@ -4,8 +4,8 @@ import Home from '@/pages/home'
 import LogManagement from '@/pages/log-management'
 import Personal from '@/pages/personal'
 import Property from '@/pages/property'
-import RealtimeData from '@/pages/realtime-data'
-import RoleManagement from '@/pages/role-management'
+import Realtime from '@/pages/realtime'
+import Role from '@/pages/role'
 import SystemSettings from '@/pages/system-settings'
 import TeachingResearch from '@/pages/teaching-research'
 
@@ -30,9 +30,9 @@ const sidebarItems = [
   },
   {
     title: '实时数据',
-    path: '/realtime-data',
+    path: '/realtime',
     icon: 'chart-line',
-    element: <RealtimeData />,
+    element: <Realtime />,
   },
   {
     title: '日志管理',
@@ -50,7 +50,7 @@ const sidebarItems = [
     title: '角色管理',
     path: '/role',
     icon: 'users',
-    element: <RoleManagement />,
+    element: <Role />,
   },
   {
     title: '账号管理',
