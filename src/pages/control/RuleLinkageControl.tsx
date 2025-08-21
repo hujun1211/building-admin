@@ -182,10 +182,10 @@ export default function RuleLinkageControl() {
 		if (isError) {
 			toast.error(error.message);
 		}
-	}, [isError]);
+	}, [isError, error]);
 	// 设置分页
 	useEffect(() => {
-		if (ruleLinkageList?.page?.totalSize) {
+		if (ruleLinkageList?.page?.totalSize && ruleLinkageList.page.totalSize > 0) {
 			setPageParams((prev) => ({
 				...prev,
 				total: ruleLinkageList.page.totalSize,
@@ -193,8 +193,30 @@ export default function RuleLinkageControl() {
 		}
 	}, [ruleLinkageList]);
 
+	// 弹窗
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [addOrUpdate, setAddOrUpdate] = useState("add");
+
+	// 表单
+	const roleForm = useForm<z.infer<typeof roleFormSchema>>({
+		resolver: zodResolver(roleFormSchema),
+		defaultValues: {
+			rule_id: "",
+			t_sensor_property_id: "",
+			c_sensor_property_id: "",
+			field: "",
+			control: "",
+			trigger: "",
+			is_used: "",
+			value: "",
+		},
+	});
+
+	const RoleIsUsedSelectOptions = [
+		{ value: "true", label: "在用" },
+		{ value: "false", label: "停用" },
+	];
+
 
 	const [monitorPropertySelectOption, setMonitorPropertySelectOption] =
 		useState<PropertyListItem[]>([]);
@@ -235,34 +257,19 @@ export default function RuleLinkageControl() {
 		mutationFn: getTriggerSelectList,
 	});
 
-	const RoleIsUsedSelectOptions = [
-		{ value: "true", label: "在用" },
-		{ value: "false", label: "停用" },
-	];
-
-	const roleForm = useForm<z.infer<typeof roleFormSchema>>({
-		resolver: zodResolver(roleFormSchema),
-		defaultValues: {
-			rule_id: "",
-			t_sensor_property_id: "",
-			c_sensor_property_id: "",
-			field: "",
-			control: "",
-			trigger: "",
-			is_used: "",
-			value: "",
-		},
-	});
-
 	async function getSelectOption() {
-		const monitorData = await getMonitorPropertyListMutate();
-		setMonitorPropertySelectOption(monitorData);
+		try {
+			const monitorData = await getMonitorPropertyListMutate();
+			setMonitorPropertySelectOption(monitorData);
 
-		const controlData = await getControlPropertyListMutate();
-		setControlPropertySelectOption(controlData);
+			const controlData = await getControlPropertyListMutate();
+			setControlPropertySelectOption(controlData);
 
-		const triggerData = await getTriggerSelectListMutate();
-		setTriggerSelectOption(triggerData);
+			const triggerData = await getTriggerSelectListMutate();
+			setTriggerSelectOption(triggerData);
+		} catch (error: any) {
+			toast.error(error.message);
+		}
 	}
 
 	function onDialogOpenChange(open: boolean) {
@@ -576,6 +583,26 @@ export default function RuleLinkageControl() {
 								/>
 								<FormField
 									control={roleForm.control}
+									name="value"
+									render={({ field }) => (
+										<FormItem className="relative flex items-center gap-5">
+											<FormLabel>触发阈值</FormLabel>
+											<div className="flex flex-col">
+												<FormControl>
+													<Input
+														{...field}
+														type="number"
+														placeholder="请输入触发阈值"
+														className="w-80 h-8"
+													/>
+												</FormControl>
+												<FormMessage className="bottom-0 absolute translate-y-full" />
+											</div>
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={roleForm.control}
 									name="is_used"
 									render={({ field }) => (
 										<FormItem className="relative flex items-center gap-5">
@@ -606,26 +633,7 @@ export default function RuleLinkageControl() {
 										</FormItem>
 									)}
 								/>
-								<FormField
-									control={roleForm.control}
-									name="value"
-									render={({ field }) => (
-										<FormItem className="relative flex items-center gap-5">
-											<FormLabel>触发阈值</FormLabel>
-											<div className="flex flex-col">
-												<FormControl>
-													<Input
-														{...field}
-														type="number"
-														placeholder="请输入触发阈值"
-														className="w-80 h-8"
-													/>
-												</FormControl>
-												<FormMessage className="bottom-0 absolute translate-y-full" />
-											</div>
-										</FormItem>
-									)}
-								/>
+
 							</form>
 						</Form>
 					</div>

@@ -19,9 +19,7 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage,
 } from "@/shadcn/ui/form";
-import { Input } from "@/shadcn/ui/input";
 import {
 	Select,
 	SelectContent,
@@ -34,20 +32,22 @@ import type { PaginationType } from "@/types";
 import ChartLine from "./chart-line";
 
 export default function RealtimePage() {
+	// 数据总揽
 	const {
 		data: outlineInfo,
-		isError,
-		error,
+		isError: isOutLineInfoError,
+		error: outLineInfoError,
 	} = useQuery({
 		queryKey: ["getOutlineInfo"],
 		queryFn: getOutlineInfo,
 	});
 	useEffect(() => {
-		if (isError) {
-			toast.error(error?.message);
+		if (isOutLineInfoError) {
+			toast.error(outLineInfoError?.message);
 		}
-	}, [isError, error]);
+	}, [isOutLineInfoError, outLineInfoError]);
 
+	// 折线图数据列表
 	const [pageParams, setPageParams] = useState<PaginationType>({
 		current: 1,
 		pageSize: 4,
@@ -55,7 +55,7 @@ export default function RealtimePage() {
 	const [searchValues, setSearchValues] = useState<
 		z.infer<typeof searchFormSchema>
 	>({});
-	const { data: sensorList } = useQuery({
+	const { data: sensorList, isError, error, isPending } = useQuery({
 		queryKey: ["getSensorList", pageParams, searchValues],
 		queryFn: () =>
 			getSensorList({
@@ -65,15 +65,28 @@ export default function RealtimePage() {
 			}),
 	});
 	useEffect(() => {
-		if (sensorList?.page?.totalSize !== undefined) {
+		if (isError) {
+			toast.error(error?.message);
+		}
+	}, [isError, error]);
+	useEffect(() => {
+		if (sensorList?.page?.totalSize && sensorList?.page?.totalSize > 0) {
 			setPageParams((prev) => ({
 				...prev,
 				total: sensorList.page.totalSize,
 			}));
-			console.log(sensorList?.page?.totalSize);
 		}
 	}, [sensorList]);
 
+	// 分页
+	function onPageChange(current: number, pageSize: number) {
+		setPageParams({
+			current,
+			pageSize,
+		});
+	}
+
+	// 转换为折线图数据
 	const chartDataList =
 		sensorList?.property?.map((item) => ({
 			data: item.times.map((time, index) => ({
@@ -85,6 +98,7 @@ export default function RealtimePage() {
 			property_id: item.property_id,
 		})) ?? [];
 
+	// 搜索表单
 	const searchFormSchema = z.object({
 		time_unit: z.string().optional(), // 统计范围（daily天 / week周 / month月）
 		property_id: z.string().optional(), // 资产编号
@@ -109,12 +123,8 @@ export default function RealtimePage() {
 		},
 	});
 
-	function onPageChange(current: number, pageSize: number) {
-		setPageParams({
-			current,
-			pageSize,
-		});
-	}
+	// 全局propertyId
+	const [propertyId, setPropertyId] = useState("");
 
 	const timeUnitSelectOption = [
 		{ value: "daily", label: "日" },
@@ -129,8 +139,6 @@ export default function RealtimePage() {
 	const { mutate: getSelectOptionMutate } = useMutation({
 		mutationFn: getBindPropertyList,
 	});
-
-	const [propertyId, setPropertyId] = useState(""); // 全局propertyId
 
 	const [spaceSelectOption, setSpaceSelectOption] = useState<
 		{ property_id: string; name: string }[]
@@ -225,6 +233,7 @@ export default function RealtimePage() {
 		});
 	}
 
+	// 重置表单
 	function resetForm() {
 		searchForm.reset();
 		setPropertyId("");
@@ -528,22 +537,30 @@ export default function RealtimePage() {
 				</Form>
 			</div>
 			<div className="mt-5">
-				{chartDataList.length > 0 ? (
-					<div className="gap-5 grid grid-cols-2">
-						{chartDataList.map((chartData, index) => (
-							<ChartLine
-								key={index}
-								chartData={chartData.data}
-								name={chartData.name}
-								field={chartData.field}
-							/>
-						))}
-					</div>
-				) : (
-					<div>
-						<h1>无数据</h1>
-					</div>
-				)}
+				{
+					isPending ? (
+						<div>
+							<Skeleton className="rounded-xl w-full h-40" />
+						</div>
+					) : (
+						chartDataList.length > 0 ? (
+							<div className="gap-5 grid grid-cols-2">
+								{chartDataList.map((chartData) => (
+									<ChartLine
+										key={chartData.name}
+										chartData={chartData.data}
+										name={chartData.name}
+										field={chartData.field}
+									/>
+								))}
+							</div>
+						) : (
+							<div>
+								<h1>无数据</h1>
+							</div>
+						)
+					)
+				}
 			</div>
 			<div className="mt-5">
 				<Pagination

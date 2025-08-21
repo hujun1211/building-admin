@@ -1,7 +1,7 @@
 import AccountManagement from "@/pages/account-management";
 import Control from "@/pages/control";
 import Home from "@/pages/home";
-import LogManagement from "@/pages/log-management";
+import Log from "@/pages/log";
 import Personal from "@/pages/personal";
 import Property from "@/pages/property";
 import Realtime from "@/pages/realtime";
@@ -36,9 +36,9 @@ const sidebarItems = [
 	},
 	{
 		title: "日志管理",
-		path: "/log-management",
+		path: "/log",
 		icon: "file-text",
-		element: <LogManagement />,
+		element: <Log />,
 	},
 	{
 		title: "教学科研",

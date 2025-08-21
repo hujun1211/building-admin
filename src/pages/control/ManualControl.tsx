@@ -3,13 +3,8 @@ import { Table } from "antd";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { ManualOperateParams } from "@/request/control";
-import {
-	getManualList,
-	getManualOperateList,
-	manualOperate,
-} from "@/request/control";
+import { getManualList, manualOperate } from "@/request/control";
 import { Badge } from "@/shadcn/ui/badge";
-import { Button } from "@/shadcn/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -19,6 +14,7 @@ import {
 import type { PaginationType } from "@/types";
 
 export default function ManualControl() {
+	// 表格列
 	const columns = [
 		{
 			title: "资产编号",
@@ -146,10 +142,10 @@ export default function ManualControl() {
 		if (isError) {
 			toast.error(error.message);
 		}
-	}, [isError]);
+	}, [isError, error]);
 	// 设置分页
 	useEffect(() => {
-		if (manualList?.page?.totalSize) {
+		if (manualList?.page?.totalSize && manualList?.page?.totalSize > 0) {
 			setPageParams((prev) => ({
 				...prev,
 				total: manualList.page.totalSize,

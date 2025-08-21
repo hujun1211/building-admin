@@ -155,7 +155,7 @@ export default function PropertyPage() {
 			align: "center",
 		},
 		{
-			title: "资产使用状态",
+			title: "资产状态",
 			dataIndex: "is_used",
 			key: "is_used",
 			align: "center",
@@ -181,25 +181,25 @@ export default function PropertyPage() {
 			},
 		},
 		{
-			title: "楼宇",
+			title: "楼宇信息",
 			dataIndex: "building",
 			key: "building",
 			align: "center",
 		},
 		{
-			title: "空间",
+			title: "空间信息",
 			dataIndex: "space",
 			key: "space",
 			align: "center",
 		},
 		{
-			title: "终端",
+			title: "网关（智能箱）信息",
 			dataIndex: "terminal",
 			key: "terminal",
 			align: "center",
 		},
 		{
-			title: "传感器",
+			title: "传感器信息",
 			dataIndex: "sensor",
 			key: "sensor",
 			align: "center",
@@ -259,10 +259,10 @@ export default function PropertyPage() {
 		if (isError) {
 			toast.error(error.message);
 		}
-	}, [isError]);
+	}, [isError, error]);
 	// 设置分页
 	useEffect(() => {
-		if (propertyData?.page?.totalSize) {
+		if (propertyData?.page?.totalSize && propertyData.page.totalSize > 0) {
 			setPageParams((prev) => ({
 				...prev,
 				total: propertyData.page.totalSize,
@@ -692,7 +692,6 @@ export default function PropertyPage() {
 										<FormControl>
 											<Input {...field} className="bg-white" />
 										</FormControl>
-										<FormMessage />
 									</div>
 								</FormItem>
 							)}
@@ -723,7 +722,6 @@ export default function PropertyPage() {
 												</SelectContent>
 											</Select>
 										</FormControl>
-										<FormMessage />
 									</div>
 								</FormItem>
 							)}
@@ -749,7 +747,6 @@ export default function PropertyPage() {
 												))}
 											</SelectContent>
 										</Select>
-										<FormMessage />
 									</div>
 								</FormItem>
 							)}
@@ -778,7 +775,6 @@ export default function PropertyPage() {
 												<FormControl>
 													<Input {...field} className="bg-white" />
 												</FormControl>
-												<FormMessage />
 											</div>
 										</FormItem>
 									)}
@@ -793,7 +789,6 @@ export default function PropertyPage() {
 												<FormControl>
 													<Input {...field} className="bg-white" />
 												</FormControl>
-												<FormMessage />
 											</div>
 										</FormItem>
 									)}
@@ -812,7 +807,6 @@ export default function PropertyPage() {
 												<FormControl>
 													<Input {...field} className="bg-white" />
 												</FormControl>
-												<FormMessage />
 											</div>
 										</FormItem>
 									)}
@@ -827,7 +821,6 @@ export default function PropertyPage() {
 												<FormControl>
 													<Input {...field} className="bg-white" />
 												</FormControl>
-												<FormMessage />
 											</div>
 										</FormItem>
 									)}
@@ -842,7 +835,6 @@ export default function PropertyPage() {
 												<FormControl>
 													<Input {...field} className="bg-white" />
 												</FormControl>
-												<FormMessage />
 											</div>
 										</FormItem>
 									)}
@@ -861,7 +853,6 @@ export default function PropertyPage() {
 												<FormControl>
 													<Input {...field} className="bg-white" />
 												</FormControl>
-												<FormMessage />
 											</div>
 										</FormItem>
 									)}
@@ -876,7 +867,6 @@ export default function PropertyPage() {
 												<FormControl>
 													<Input {...field} className="bg-white" />
 												</FormControl>
-												<FormMessage />
 											</div>
 										</FormItem>
 									)}
@@ -909,7 +899,6 @@ export default function PropertyPage() {
 														))}
 													</SelectContent>
 												</Select>
-												<FormMessage className="bottom-0 absolute translate-y-full" />
 											</div>
 										</FormItem>
 									)}
@@ -938,7 +927,6 @@ export default function PropertyPage() {
 														))}
 													</SelectContent>
 												</Select>
-												<FormMessage className="bottom-0 absolute translate-y-full" />
 											</div>
 										</FormItem>
 									)}

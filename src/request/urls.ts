@@ -105,4 +105,10 @@ export const urls = {
 		getTaskInterVal: combineUrl("/setpage/get_liveness_task_interval"),
 		setTaskInterVal: combineUrl("/setpage/set_liveness_task_interval"),
 	},
+
+	// 日志
+	log: {
+		getLogList: combineUrl("/logpage/search_info"),
+		getLogTypeList: combineUrl("/logpage/get_type_list"),
+	},
 };
