@@ -1,33 +1,33 @@
-import request from '@/request/index'
-import { urls } from '@/request/urls'
+import request from "@/request/index";
+import { urls } from "@/request/urls";
 
 export interface UserInfo {
-  username: string
-  remark_name: string
-  mail: string
-  role_list: string[]
-  tool_list: string[]
+	username: string;
+	remark_name: string;
+	mail: string;
+	role_list: string[];
+	tool_list: string[];
 }
 
 // 登录
 interface LoginParams {
-  username: string
-  password: string
+	username: string;
+	password: string;
 }
-interface LoginResponse {
-  token: string
-  tokenInfo: any
+export interface LoginResponse {
+	token: string;
+	tokenInfo: any;
 }
 export function login(data: LoginParams): Promise<LoginResponse> {
-  return request.post(urls.authority.login, data)
+	return request.post(urls.authority.login, data);
 }
 
 // 退出
 export function logout() {
-  return request.post(urls.authority.logout)
+	return request.post(urls.authority.logout);
 }
 
 // token 验证
 export function tokenValidate(): Promise<{ isValid: boolean }> {
-  return request.post(urls.authority.tokenValidate)
+	return request.post(urls.authority.tokenValidate);
 }

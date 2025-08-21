@@ -1,8 +1,8 @@
 interface PaginationType {
-  current: number
-  pageSize: number
-  showSizeChanger?: boolean
-  total?: number
+	current: number;
+	pageSize: number;
+	showSizeChanger?: boolean;
+	total?: number;
 }
 
-export type { PaginationType }
+export type { PaginationType };
