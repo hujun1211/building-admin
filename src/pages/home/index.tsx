@@ -1,14 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, NavLink } from "react-router";
-import { toast } from "sonner";
-import {
-	getAlarm,
-	getAlarmCount,
-	getOnlineUnit,
-	getPropertyCount,
-} from "@/request/home";
+import { getAlarmInfo, getOutLineInfo } from "@/request/home";
 import { getTaskInterVal } from "@/request/settings";
 import { Button } from "@/shadcn/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shadcn/ui/card";
@@ -18,44 +12,25 @@ import { ChartPie } from "./chart-pie";
 import { BuildingTable } from "./table";
 
 export default function HomePage() {
-	const { data: onlineUnit } = useQuery({
-		queryKey: ["onlineUnit"],
-		queryFn: getOnlineUnit,
+	const { data: outlineInfo } = useQuery({
+		queryKey: ["getOutLineInfo"],
+		queryFn: getOutLineInfo,
 	});
+	const { device_unit, alarm_unit, property_unit, building_property_unit, sensor_kind_unit } = outlineInfo || {}
 
-	const { data: propertyCount } = useQuery({
-		queryKey: ["propertyCount"],
-		queryFn: getPropertyCount,
-	});
-
-	const { data: alarmCount } = useQuery({
-		queryKey: ["alarmCount"],
-		queryFn: getAlarmCount,
-	});
-
-	const [lineChartType, setLineChartType] = useState<"day" | "week" | "month">(
-		"day",
+	const [lineChartType, setLineChartType] = useState<"daily" | "week" | "month">(
+		"daily",
 	);
-
-	const { data: alarm } = useQuery({
+	const { data: alarmInfo } = useQuery({
 		queryKey: ["alarm"],
-		queryFn: getAlarm,
+		queryFn: getAlarmInfo,
 	});
 
 	// 任务间隔
-	const {
-		data: taskInterVal,
-		isError,
-		error,
-	} = useQuery({
+	const { data: taskInterVal } = useQuery({
 		queryKey: ["getTaskInterVal"],
 		queryFn: getTaskInterVal,
 	});
-	useEffect(() => {
-		if (isError) {
-			toast.error(error?.message);
-		}
-	}, [isError, error]);
 
 	return (
 		<div className="p-5">
@@ -65,19 +40,19 @@ export default function HomePage() {
 						<div className="flex justify-between items-center">
 							<div className="text-gray-500 text-xl">在线设备</div>
 							<div
-								className={`flex items-center text-sm ${onlineUnit?.trend === "decrease" ? "text-green-500" : "text-red-500"}`}
+								className={`flex items-center text-sm ${device_unit?.trend === "decrease" ? "text-green-500" : "text-red-500"}`}
 							>
-								{onlineUnit?.trend === "decrease" ? (
+								{device_unit?.trend === "decrease" ? (
 									<ArrowDown className="mr-1" />
 								) : (
 									<ArrowUp className="mr-1" />
 								)}
-								<span>{onlineUnit?.trend_count}%</span>
+								<span>{device_unit?.trend_count}%</span>
 								<span className="ml-2">较昨日</span>
 							</div>
 						</div>
 						<div className="mt-5 font-semibold text-4xl">
-							{onlineUnit?.count}
+							{device_unit?.count}
 						</div>
 					</CardContent>
 				</Card>
@@ -86,19 +61,19 @@ export default function HomePage() {
 						<div className="flex justify-between items-center">
 							<div className="text-gray-500 text-xl">预警数量</div>
 							<div
-								className={`flex items-center text-sm ${alarmCount?.trend === "decrease" ? "text-green-500" : "text-red-500"}`}
+								className={`flex items-center text-sm ${alarm_unit?.trend === "decrease" ? "text-green-500" : "text-red-500"}`}
 							>
-								{alarmCount?.trend === "decrease" ? (
+								{alarm_unit?.trend === "decrease" ? (
 									<ArrowDown className="mr-1" />
 								) : (
 									<ArrowUp className="mr-1" />
 								)}
-								<span>{alarmCount?.trend_count}%</span>
+								<span>{alarm_unit?.trend_count}%</span>
 								<span className="ml-2">较昨日</span>
 							</div>
 						</div>
 						<div className="mt-5 font-semibold text-4xl">
-							{alarmCount?.count}
+							{alarm_unit?.count}
 						</div>
 					</CardContent>
 				</Card>
@@ -109,13 +84,13 @@ export default function HomePage() {
 							<div className="text-gray-500 text-sm">
 								含
 								<span className="mx-1 text-red-500">
-									{propertyCount?.terminals_count}
+									{property_unit?.terminals_count}
 								</span>
 								个网关（智能箱子）
 							</div>
 						</div>
 						<div className="mt-5 font-semibold text-4xl">
-							{propertyCount?.spaces_count}
+							{property_unit?.spaces_count}
 						</div>
 					</CardContent>
 				</Card>
@@ -135,13 +110,13 @@ export default function HomePage() {
 							</NavLink>
 						</CardTitle>
 						<Tabs
-							defaultValue="day"
+							defaultValue="daily"
 							onValueChange={(value) =>
-								setLineChartType(value as "day" | "week" | "month")
+								setLineChartType(value as "daily" | "week" | "month")
 							}
 						>
 							<TabsList>
-								<TabsTrigger value="day">日</TabsTrigger>
+								<TabsTrigger value="daily">日</TabsTrigger>
 								<TabsTrigger value="week">周</TabsTrigger>
 								<TabsTrigger value="month">月</TabsTrigger>
 							</TabsList>
@@ -157,9 +132,9 @@ export default function HomePage() {
 					</CardHeader>
 					<CardContent>
 						<div className="flex flex-col gap-2">
-							{alarm?.slice(0, 3).map((item, index: number) => (
+							{alarmInfo?.slice(0, 3).map((item, index: number) => (
 								<div
-									key={index}
+									key={item.content}
 									className="bg-red-100 p-4 border-red-500 border-l-4 rounded-lg text-red-700"
 									role="alert"
 								>
@@ -182,7 +157,7 @@ export default function HomePage() {
 						</div>
 					</CardHeader>
 					<CardContent>
-						<BuildingTable />
+						<BuildingTable tableData={building_property_unit} />
 					</CardContent>
 				</Card>
 				<Card className="col-span-1 border-gray-100/50 h-full">
@@ -190,7 +165,7 @@ export default function HomePage() {
 						<CardTitle>设备类型统计</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<ChartPie />
+						<ChartPie pieData={sensor_kind_unit} />
 					</CardContent>
 				</Card>
 			</div>

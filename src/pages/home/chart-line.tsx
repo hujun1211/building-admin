@@ -1,10 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
-import {
-	getActiveUnitTrendDay,
-	getActiveUnitTrendMonth,
-	getActiveUnitTrendWeek,
-} from "@/request/home";
+import { getLivenessCountList } from "@/request/home";
 import type { ChartConfig } from "@/shadcn/ui/chart";
 import {
 	ChartContainer,
@@ -19,24 +15,36 @@ const chartConfig = {
 	},
 } satisfies ChartConfig;
 
-export function ChartLine({ type }: { type: "day" | "week" | "month" }) {
-	const { data: chartDataDay } = useQuery({
+export function ChartLine({ type }: { type: "daily" | "week" | "month" }) {
+	const { data: chartDataDayRes } = useQuery({
 		queryKey: ["activeUnitTrendDay"],
-		queryFn: getActiveUnitTrendDay,
+		queryFn: () => getLivenessCountList({ time_unit: "daily" }),
 	});
+	const chartDataDay = chartDataDayRes?.times.map((time, index) => ({
+		time,
+		value: chartDataDayRes?.values[index]
+	}))
 
-	const { data: chartDataWeek } = useQuery({
+	const { data: chartDataWeekRes } = useQuery({
 		queryKey: ["activeUnitTrendWeek"],
-		queryFn: getActiveUnitTrendWeek,
+		queryFn: () => getLivenessCountList({ time_unit: "week" }),
 	});
+	const chartDataWeek = chartDataWeekRes?.times.map((time, index) => ({
+		time,
+		value: chartDataWeekRes?.values[index]
+	}))
 
-	const { data: chartDataMonth } = useQuery({
+	const { data: chartDataMonthRes } = useQuery({
 		queryKey: ["activeUnitTrendMonth"],
-		queryFn: getActiveUnitTrendMonth,
+		queryFn: () => getLivenessCountList({ time_unit: "month" }),
 	});
+	const chartDataMonth = chartDataMonthRes?.times.map((time, index) => ({
+		time,
+		value: chartDataMonthRes?.values[index]
+	}))
 
 	const chartDataMap = {
-		day: chartDataDay,
+		daily: chartDataDay,
 		week: chartDataWeek,
 		month: chartDataMonth,
 	};

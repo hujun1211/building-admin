@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 
 // 创建实例
 const instance = axios.create({
@@ -26,15 +27,15 @@ instance.interceptors.response.use(
 			return res.result ?? res.data;
 		}
 		if (res.code === "A0001") {
-			console.error("Token无效");
+			toast.error("Token无效");
 			return Promise.reject(new Error("Token无效"));
 		} else {
-			console.error(res.message || "请求出错");
+			toast.error(res.message || "请求出错");
 			return Promise.reject(res);
 		}
 	},
 	(error) => {
-		console.error(error?.response?.data?.message || "网络错误");
+		toast.error(error.message || "请求出错");
 		return Promise.reject(error);
 	},
 );

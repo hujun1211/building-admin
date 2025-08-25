@@ -98,6 +98,8 @@ export default function RealtimePage() {
 			property_id: item.property_id,
 		})) ?? [];
 
+	console.log(chartDataList);
+
 	// 搜索表单
 	const searchFormSchema = z.object({
 		time_unit: z.string().optional(), // 统计范围（daily天 / week周 / month月）

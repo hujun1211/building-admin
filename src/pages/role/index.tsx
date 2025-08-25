@@ -99,8 +99,6 @@ export default function RolePage() {
 			),
 		},
 	];
-	// 数据源
-	const [dataSource, setDataSource] = useState<RoleUser[]>([]);
 	// 分页
 	const [pageParams, setPageParams] = useState<PaginationType>({
 		current: 1,
@@ -114,7 +112,7 @@ export default function RolePage() {
 	// 表格请求
 	const {
 		isPending: tablePending,
-		error: tableError,
+		isRefetching,
 		data: tableData,
 		refetch: tableRefetch,
 	} = useQuery({
@@ -128,11 +126,14 @@ export default function RolePage() {
 	});
 	// 设置分页
 	useEffect(() => {
-		if (tableError) {
-			toast.error(tableError.message);
+		if (isRefetching && tableData) {
+			setPageParams({
+				...pageParams,
+				total: tableData.roleList.total,
+			});
+			getRolePermissionMap(tableData);
 		}
-		if (tableData) {
-			setDataSource(tableData.roleList.records);
+		if (!isRefetching && tableData) {
 			setPageParams({
 				...pageParams,
 				total: tableData.roleList.total,
@@ -140,15 +141,17 @@ export default function RolePage() {
 			getRolePermissionMap(tableData);
 			getRolePermissionKeyMap();
 		}
-	}, [tableError, tableData]);
+	}, [tableData, isRefetching]);
 
 	// 角色权限
 	const { mutate: roleUserMutate, mutateAsync: roleUserMutateAsync } =
 		useMutation({
 			mutationFn: getRolePermission,
 		});
+
 	// 获取权限的keyMap
 	const [roleKeyMap, setRoleKeyMap] = useState<Record<string, string>>({});
+	// 表单权限树
 	const [rolePermissionTreeData, setRolePermissionTreeData] = useState<
 		TreeDataNode[]
 	>([]);
@@ -158,9 +161,6 @@ export default function RolePage() {
 			onSuccess: (res) => {
 				setRoleKeyMap(res.keyMap);
 				setRolePermissionTreeData(res.data);
-			},
-			onError: (error) => {
-				toast.error(error.message);
 			},
 		});
 	}
@@ -193,9 +193,6 @@ export default function RolePage() {
 				toast.success("删除成功");
 				tableRefetch();
 			},
-			onError: (error) => {
-				toast.error(error.message);
-			},
 		});
 		tableRefetch();
 	}
@@ -211,6 +208,7 @@ export default function RolePage() {
 				roleName: "",
 				description: "",
 			});
+			setCheckedKeys([]);
 		}
 	}
 
@@ -259,57 +257,51 @@ export default function RolePage() {
 	async function onSubmit(values: z.infer<typeof roleFormSchema>) {
 		const buildingMenuPermissions = checkedKeys.map((value) => {
 			return {
-				resourceType: value,
+				resourceType: "menu_building",
 				permissionName: roleKeyMap[value],
 				department: "test",
 			};
 		});
 
 		if (addOrUpdate === "add") {
-			try {
-				await addRoleMutate(values);
-				await updateRolePermissionMutate({
-					roleName: values.roleName,
-					buildingMenuPermissions,
-					dataPermissions: [],
-					applicationPermissions: [],
-					etlPermissions: [],
-					tablePermissions: [],
-					equipPermissions: [],
-					filePermissions: [],
-					menuPermissions: [],
-				});
-				setDialogOpen(false);
-				toast.success("新增成功");
-				roleForm.reset();
-				tableRefetch();
-			} catch (error: any) {
-				toast.error(error.message);
-			}
-		} else {
-			try {
-				await updateRoleMutate(values);
-				await updateRolePermissionMutate({
-					roleName: values.roleName,
-					buildingMenuPermissions,
-					dataPermissions: [],
-					applicationPermissions: [],
-					etlPermissions: [],
-					tablePermissions: [],
-					equipPermissions: [],
-					filePermissions: [],
-					menuPermissions: [],
-				});
-				setDialogOpen(false);
-				toast.success("更新成功");
-				roleForm.reset();
-				tableRefetch();
-			} catch (error: any) {
-				toast.error(error.message);
-			}
+			await addRoleMutate(values);
+			await updateRolePermissionMutate({
+				roleName: values.roleName,
+				buildingMenuPermissions,
+				dataPermissions: [],
+				applicationPermissions: [],
+				etlPermissions: [],
+				tablePermissions: [],
+				equipPermissions: [],
+				filePermissions: [],
+				menuPermissions: [],
+			});
+			setDialogOpen(false);
+			toast.success("新增成功");
+			roleForm.reset();
+			tableRefetch();
+		}
+		else {
+			await updateRoleMutate(values);
+			await updateRolePermissionMutate({
+				roleName: values.roleName,
+				buildingMenuPermissions,
+				dataPermissions: [],
+				applicationPermissions: [],
+				etlPermissions: [],
+				tablePermissions: [],
+				equipPermissions: [],
+				filePermissions: [],
+				menuPermissions: [],
+			});
+			setDialogOpen(false);
+			toast.success("更新成功");
+			roleForm.reset();
+			tableRefetch();
 		}
 	}
 
+	// 权限树
 	const [expandedKeys, setExpandedKeys] = useState<string[]>(["menu_building"]);
 	const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
 
@@ -335,7 +327,7 @@ export default function RolePage() {
 
 			<Table
 				columns={columns}
-				dataSource={dataSource}
+				dataSource={tableData?.roleList.records}
 				loading={tablePending}
 				pagination={pageParams}
 				onChange={handlePaginationChange}

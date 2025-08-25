@@ -1,81 +1,57 @@
 import request from "@/request/index";
 import { urls } from "@/request/urls";
 
-interface OnlineUnitResponse {
-	count: number;
-	trend: string;
-	trend_count: number;
-}
-
-interface AlarmCountResponse {
-	count: number;
-	trend: string;
-	trend_count: number;
-}
-
-interface PropertyCountResponse {
-	terminals_count: number;
-	spaces_count: number;
-}
-
-export interface ActiveUnitTrend {
-	time: string;
-	value: number;
-}
-
 export interface AlarmItem {
 	content: string;
 	description: string;
 }
 
-export interface PropertyItem {
-	name: string;
-	space_count: number;
-	device_count: number;
-	device_online_rate: number;
+export type OutLineInfoResponse = {
+	device_unit: {
+		count: number;
+		trend: string;
+		trend_count: number;
+	};
+	alarm_unit: {
+		count: number;
+		trend: string;
+		trend_count: number;
+	};
+	property_unit: {
+		terminals_count: number;
+		spaces_count: number;
+	};
+	building_property_unit: {
+		name: string;
+		space_count: number;
+		device_count: number;
+		device_online_rate: number;
+	}[];
+	sensor_kind_unit: {
+		kind: string;
+		count: number;
+	}[];
+};
+
+export function getOutLineInfo(): Promise<OutLineInfoResponse> {
+	return request.get(urls.home.getOutLineInfo);
 }
 
-export function getOnlineUnit(): Promise<OnlineUnitResponse> {
-	return request.get(urls.home.onlineUnit);
-}
-
-export function getAlarmCount(): Promise<AlarmCountResponse> {
-	return request.get(urls.home.alarmCount);
-}
-
-export function getPropertyCount(): Promise<PropertyCountResponse> {
-	return request.get(urls.home.propertyCount);
-}
-
-export function getActiveUnitTrendDay(): Promise<ActiveUnitTrend[]> {
-	return request.get(urls.home.vitality_day);
-}
-
-export function getActiveUnitTrendWeek(): Promise<ActiveUnitTrend[]> {
-	return request.get(urls.home.vitality_week);
-}
-
-export function getActiveUnitTrendMonth(): Promise<ActiveUnitTrend[]> {
-	return request.get(urls.home.vitality_month);
-}
-
-export function getAlarm(): Promise<AlarmItem[]> {
+export function getAlarmInfo(): Promise<AlarmItem[]> {
 	return request.get(urls.home.alarm);
 }
 
-export function getPropertyList(): Promise<PropertyItem[]> {
-	return request.get(urls.home.propertyList);
+interface getLivenessCountListParams {
+	end_time?: string;
+	time_unit?: string;
+}
+interface getLivenessCountListResponse {
+	values: string[];
+	times: string[];
 }
 
-export function getSensorKind(): Promise<string[]> {
-	return request.get(urls.home.sensor_kind);
-}
-
-export interface DeviceCategory {
-	kind: string;
-	count: number;
-}
-
-export function getDeviceCategory(): Promise<DeviceCategory[]> {
-	return request.get(urls.home.sensor_kind);
+export function getLivenessCountList(
+	params: getLivenessCountListParams,
+): Promise<getLivenessCountListResponse> {
+	return request.get(urls.home.getLivenessCountList, { params });
 }

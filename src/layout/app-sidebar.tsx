@@ -50,16 +50,15 @@ export function AppSidebar() {
 
 		tokenValidateMutate(undefined, {
 			onSuccess: (data) => {
-				if (data && data.isValid) {
+				if (data?.isValid) {
 					const decoded = jwtDecode(token);
 					setUserInfo(decoded as UserInfo);
 				} else {
 					navigate("/login");
 				}
 			},
-			onError: (error) => {
+			onError: () => {
 				navigate("/login");
-				toast.error(error.message);
 			},
 		});
 	}, []);
@@ -72,9 +71,6 @@ export function AppSidebar() {
 			onSuccess: () => {
 				localStorage.removeItem("token");
 				navigate("/login");
-			},
-			onError: (error) => {
-				toast.error(error.message);
 			},
 		});
 	}

@@ -1,3 +1,5 @@
+import { add } from "date-fns";
+
 function combineAuthorityUrl(url: string) {
 	return `${import.meta.env.VITE_BASE_URL}${url}`;
 }
@@ -16,17 +18,9 @@ export const urls = {
 
 	// 首页
 	home: {
-		onlineUnit: combineUrl("/homepage/online_unit"),
-		alarmCount: combineUrl("/homepage/alarm_count"),
-		propertyCount: combineUrl("/homepage/property_count"),
-
-		vitality_day: combineUrl("/homepage/vitality_day"),
-		vitality_week: combineUrl("/homepage/vitality_week"),
-		vitality_month: combineUrl("/homepage/vitality_month"),
-
-		alarm: combineUrl("/homepage/alarm"),
-		propertyList: combineUrl("/homepage/property"),
-		sensor_kind: combineUrl("/homepage/sensor_kind"),
+		getOutLineInfo: combineUrl("/homepage/get_outline_info"),
+		alarm: combineUrl("/homepage/get_alarm_info"),
+		getLivenessCountList: combineUrl("/homepage/get_liveness_count_list"),
 	},
 
 	// 账号（用户）
@@ -110,5 +104,11 @@ export const urls = {
 	log: {
 		getLogList: combineUrl("/logpage/search_info"),
 		getLogTypeList: combineUrl("/logpage/get_type_list"),
+
+		getThresholdRuleList: combineUrl("/controlpage/threshold/search_info"),
+		addThresholdRule: combineUrl("/controlpage/threshold/add"),
+		updateThresholdRule: combineUrl("/controlpage/threshold/update"),
+
+		getThresholdRuleDetails: combineUrl("/controlpage/threshold/get"),
 	},
 };

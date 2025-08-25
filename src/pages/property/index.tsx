@@ -224,7 +224,7 @@ export default function PropertyPage() {
 	// 表格分页
 	const [pageParams, setPageParams] = useState<PaginationType>({
 		current: 1,
-		pageSize: 5,
+		pageSize: 10,
 		showSizeChanger: false,
 	});
 	const [searchValues, setSearchValues] = useState<
@@ -239,8 +239,6 @@ export default function PropertyPage() {
 		data: propertyData,
 		isPending: isLoading,
 		refetch,
-		isError,
-		error,
 	} = useQuery({
 		queryKey: [
 			"propertyList",
@@ -255,11 +253,6 @@ export default function PropertyPage() {
 				...searchValues,
 			}),
 	});
-	useEffect(() => {
-		if (isError) {
-			toast.error(error.message);
-		}
-	}, [isError, error]);
 	// 设置分页
 	useEffect(() => {
 		if (propertyData?.page?.totalSize && propertyData.page.totalSize > 0) {
