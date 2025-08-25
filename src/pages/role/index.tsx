@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { TreeDataNode, TreeProps } from "antd";
+import type { TreeDataNode } from "antd";
 import { Popconfirm, Table, Tree } from "antd";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -160,7 +160,7 @@ export default function RolePage() {
 		roleUserMutate("", {
 			onSuccess: (res) => {
 				setRoleKeyMap(res.keyMap);
-				setRolePermissionTreeData(res.data);
+				setRolePermissionTreeData(res?.data[0]?.children);
 			},
 		});
 	}
@@ -194,7 +194,6 @@ export default function RolePage() {
 				tableRefetch();
 			},
 		});
-		tableRefetch();
 	}
 
 	// 打开Dialog
@@ -318,7 +317,7 @@ export default function RolePage() {
 		<div className="p-5">
 			<div className="mt-5">
 				<Button
-					className="flex justify-center items-center bg-blue-500 hover:bg-blue-400 rounded-lg w-25 h-10 text-white cursor-pointer"
+					className="cursor-pointer"
 					onClick={handleOpenAddDialog}
 				>
 					新增

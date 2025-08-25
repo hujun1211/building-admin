@@ -380,7 +380,7 @@ export default function RuleLinkageControl() {
 		<div>
 			<div>
 				<Button
-					className="flex justify-center items-center bg-blue-500 hover:bg-blue-400 rounded-lg w-25 h-10 text-white cursor-pointer"
+					className="cursor-pointer"
 					onClick={handleOpenAddDialog}
 				>
 					新增

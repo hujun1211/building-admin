@@ -121,18 +121,17 @@ export default function LogManagement() {
 
 	function onSearchFormSubmit(values: z.infer<typeof searchFormSchema>) {
 		setSearchValues(values);
-	}
-
-	function onResetForm() {
-		searchForm.reset();
-		setSearchValues({});
+		setPageParams({
+			...pageParams,
+			current: 1,
+		});
 	}
 
 	return (
 		<div className="p-5">
 			<div>
-				<Form {...searchForm}>
-					<form className="space-y-8">
+				<Form {...searchForm} >
+					<form className="space-y-8" onSubmit={searchForm.handleSubmit(onSearchFormSubmit)}>
 						<div className="flex gap-5">
 							<FormField
 								control={searchForm.control}
@@ -236,16 +235,15 @@ export default function LogManagement() {
 								)}
 							/>
 							<Button
-								type="button"
+								type="submit"
 								className="cursor-pointer"
-								onClick={searchForm.handleSubmit(onSearchFormSubmit)}
 							>
 								查询
 							</Button>
 							<Button
 								type="button"
 								className="cursor-pointer"
-								onClick={onResetForm}
+								onClick={() => searchForm.reset()}
 							>
 								清空
 							</Button>
@@ -261,6 +259,7 @@ export default function LogManagement() {
 						current: pageParams.current,
 						pageSize: pageParams.pageSize,
 						total: pageParams.total,
+						showSizeChanger: false,
 						onChange: onPageChange,
 					}}
 					loading={isPending}

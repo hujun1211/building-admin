@@ -1,3 +1,5 @@
+import { s } from "node_modules/react-router/dist/development/components-CuPfnyiZ.d.mts";
+import type { P } from "node_modules/react-router/dist/development/context-DohQKLID.d.mts";
 import request from "@/request";
 import type { RoleUser } from "@/request/role";
 import { urls } from "@/request/urls";
@@ -9,7 +11,11 @@ interface AccountTableListParams {
 	username: string;
 }
 export interface AccountTableListResponse {
-	userInfoList: any[];
+	userInfoList: {
+		username: string;
+		remarkName: string;
+		phone: string;
+	}[];
 	page: {
 		currentPage: number;
 		pageSize: number;
@@ -46,4 +52,59 @@ interface AccountPasswordResetParams {
 }
 export function accountPasswordReset(data: AccountPasswordResetParams) {
 	return request.post(urls.account.accountPasswordReset, data);
+}
+
+// 删除账号
+export function accountDelete(username: string) {
+	return request({
+		url: urls.account.accountDelete,
+		method: "POST",
+		data: {
+			username,
+		},
+	});
+}
+
+// 创建账号
+interface AccountCreateParams {
+	username: string;
+	password: string;
+	remarkName: string;
+	phone?: string;
+	department?: string;
+}
+export function accountCreate(data: AccountCreateParams) {
+	return request.post(urls.account.accountCreate, {
+		...data,
+		department: "test",
+	});
+}
+
+// 角色列表
+export function getRoleList(): Promise<{ roleName: string }[]> {
+	return request({
+		url: urls.role.roleList,
+		method: "POST",
+		data: {
+			username: "",
+		},
+	});
+}
+
+// 绑定角色
+export function accountRoleUpdate({
+	username,
+	roleNames,
+}: {
+	username: string;
+	roleNames: string[];
+}) {
+	return request({
+		method: "post",
+		url: urls.account.accountRoleUpdate,
+		data: {
+			username,
+			roleNames,
+		},
+	});
 }

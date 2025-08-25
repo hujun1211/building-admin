@@ -168,7 +168,6 @@ export default function ThresholdRule() {
     setDialogOpen(true);
     getThresholdRuleDetailsMutate(record.rule_id, {
       onSuccess: (data) => {
-        console.log(data);
         thresholdRuleForm.reset(data);
       },
     })
@@ -199,7 +198,6 @@ export default function ThresholdRule() {
     queryFn: () => getBindPropertyList({ property_type: "CGQ" }),
   });
   const sensorPropertyId = thresholdRuleForm.watch("sensor_property_id");
-  console.log(sensorPropertyId);
   const { data: fieldSelectOption } = useQuery({
     queryKey: ["getFieldSelectList", sensorPropertyId],
     queryFn: () => getFieldSelectList(sensorPropertyId),
@@ -245,7 +243,7 @@ export default function ThresholdRule() {
     <div className="p-5">
       <div>
         <Button
-          className="flex justify-center items-center bg-blue-500 hover:bg-blue-400 rounded-lg w-25 h-10 text-white cursor-pointer"
+          className="cursor-pointer"
           onClick={handleOpenAddDialog}
         >
           新增

@@ -2,13 +2,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Table } from "antd";
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import type { BindPropertyListItem } from "@/request/property";
 import {
 	addProperty,
+	exportPropertyList,
 	getBindPropertyList,
 	getPropertyDetails,
 	getPropertyList,
@@ -135,91 +136,94 @@ const buildingIsUsedSelectOptions = [
 export default function PropertyPage() {
 	// 楼宇资产表格
 	// 表格列
-	const columns = [
-		{
-			title: "资产编号",
-			dataIndex: "property_id",
-			key: "property_id",
-			align: "center",
-		},
-		{
-			title: "资产名称",
-			dataIndex: "property_name",
-			key: "property_name",
-			align: "center",
-		},
-		{
-			title: "资产类型",
-			dataIndex: "property_type",
-			key: "property_type",
-			align: "center",
-		},
-		{
-			title: "资产状态",
-			dataIndex: "is_used",
-			key: "is_used",
-			align: "center",
-			render: (is_used: boolean) => {
-				return is_used ? (
-					<Badge className="bg-green-500">在用</Badge>
-				) : (
-					<Badge className="bg-red-500">停用</Badge>
-				);
+	const [propertyTitle, setPropertyTitle] = useState("资产名称");
+	const columns = useMemo(() => {
+		return [
+			{
+				title: "资产编号",
+				dataIndex: "property_id",
+				key: "property_id",
+				align: "center",
 			},
-		},
-		{
-			title: "活跃情况",
-			dataIndex: "is_liveness",
-			key: "is_liveness",
-			align: "center",
-			render: (is_liveness: boolean) => {
-				return is_liveness ? (
-					<Badge className="bg-green-500">在线</Badge>
-				) : (
-					<Badge className="bg-red-500">离线</Badge>
-				);
+			{
+				title: () => propertyTitle,
+				dataIndex: "property_name",
+				key: "property_name",
+				align: "center",
 			},
-		},
-		{
-			title: "楼宇信息",
-			dataIndex: "building",
-			key: "building",
-			align: "center",
-		},
-		{
-			title: "空间信息",
-			dataIndex: "space",
-			key: "space",
-			align: "center",
-		},
-		{
-			title: "网关（智能箱）信息",
-			dataIndex: "terminal",
-			key: "terminal",
-			align: "center",
-		},
-		{
-			title: "传感器信息",
-			dataIndex: "sensor",
-			key: "sensor",
-			align: "center",
-		},
-		{
-			title: "操作",
-			dataIndex: "operation",
-			key: "operation",
-			align: "center",
-			render: (_, record: any) => (
-				<Button
-					variant="link"
-					className="text-blue-500 cursor-pointer"
-					onClick={() => handleOpenEditDialog(record)}
-				>
-					编辑
-				</Button>
-			),
-		},
-	];
+			{
+				title: "资产类型",
+				dataIndex: "property_type",
+				key: "property_type",
+				align: "center",
+			},
+			{
+				title: "资产状态",
+				dataIndex: "is_used",
+				key: "is_used",
+				align: "center",
+				render: (is_used: boolean) => {
+					return is_used ? (
+						<Badge className="bg-green-500">在用</Badge>
+					) : (
+						<Badge className="bg-red-500">停用</Badge>
+					);
+				},
+			},
+			{
+				title: "活跃情况",
+				dataIndex: "is_liveness",
+				key: "is_liveness",
+				align: "center",
+				render: (is_liveness: boolean) => {
+					return is_liveness ? (
+						<Badge className="bg-green-500">在线</Badge>
+					) : (
+						<Badge className="bg-red-500">离线</Badge>
+					);
+				},
+			},
+			{
+				title: "楼宇信息",
+				dataIndex: "building",
+				key: "building",
+				align: "center",
+			},
+			{
+				title: "空间信息",
+				dataIndex: "space",
+				key: "space",
+				align: "center",
+			},
+			{
+				title: "网关（智能箱）信息",
+				dataIndex: "terminal",
+				key: "terminal",
+				align: "center",
+			},
+			{
+				title: "传感器信息",
+				dataIndex: "sensor",
+				key: "sensor",
+				align: "center",
+			},
+			{
+				title: "操作",
+				dataIndex: "operation",
+				key: "operation",
+				align: "center",
+				render: (_, record: any) => (
+					<Button
+						variant="link"
+						className="text-blue-500 cursor-pointer"
+						onClick={() => handleOpenEditDialog(record)}
+					>
+						编辑
+					</Button>
+				),
+			},
+		];
+	}, [propertyTitle])
 
 	// 表格分页
 	const [pageParams, setPageParams] = useState<PaginationType>({
@@ -301,6 +305,21 @@ export default function PropertyPage() {
 			...pageParams,
 			current: 1,
 		});
+		if (values.property_type === "building") {
+			setPropertyTitle("楼宇名称（楼栋号）");
+		}
+		else if (values.property_type === "space") {
+			setPropertyTitle("空间名称（房间号）");
+		}
+		else if (values.property_type === "terminal") {
+			setPropertyTitle("网关（智能箱）编号（型号）");
+		}
+		else if (values.property_type === "sensor") {
+			setPropertyTitle("传感器大类（小类）");
+		}
+		else {
+			setPropertyTitle("资产名称");
+		}
 	}
 
 	// 定义表单
@@ -667,6 +686,33 @@ export default function PropertyPage() {
 		}
 	}
 
+	const { mutate: getBindPropertyListMutate } = useMutation({
+		mutationFn: exportPropertyList
+	})
+	function exportProperty() {
+		getBindPropertyListMutate({
+			page: 1,
+			page_size: 10,
+			is_excel: true,
+			...searchValues,
+		},
+			{
+				onSuccess: (res) => {
+					const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
+					const url = window.URL.createObjectURL(blob);
+					const link = document.createElement('a');
+					link.href = url;
+					link.download = '资产列表.xlsx';
+					link.click();
+					window.URL.revokeObjectURL(url);
+				},
+				onError: (error) => {
+					toast.error(error.message);
+				}
+			}
+		)
+	}
+
 	return (
 		<div className="p-5">
 			<Form {...searchForm}>
@@ -753,6 +799,13 @@ export default function PropertyPage() {
 							onClick={() => searchForm.reset()}
 						>
 							清空
+						</Button>
+						<Button
+							type="button"
+							className="cursor-pointer"
+							onClick={exportProperty}
+						>
+							导出
 						</Button>
 					</div>
 					<div>
@@ -931,7 +984,7 @@ export default function PropertyPage() {
 			</Form>
 			<div className="mt-10">
 				<Button
-					className="flex justify-center items-center bg-blue-500 hover:bg-blue-400 rounded-lg w-25 h-10 text-white cursor-pointer"
+					className="cursor-pointer"
 					onClick={handleOpenAddDialog}
 				>
 					新增

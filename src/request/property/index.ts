@@ -1,3 +1,4 @@
+import axios from "axios";
 import request from "@/request/index";
 import { urls } from "@/request/urls";
 
@@ -25,6 +26,7 @@ interface PropertyListResponse {
 interface propertyListParams {
 	page: number;
 	page_size: number;
+	is_excel?: boolean;
 	status?: string; // 资产使用状态
 	property_id?: string; // 资产编号
 	property_type?: string; // 资产类型
@@ -69,6 +71,21 @@ export function getPropertyList(
 	params: propertyListParams,
 ): Promise<PropertyListResponse> {
 	return request.get(urls.property.propertyList, {
+		params,
+	});
+}
+
+// 资产导出
+export function exportPropertyList(
+	params: propertyListParams,
+): Promise<{ data: Blob }> {
+	return axios({
+		baseURL: import.meta.env.VITE_API_BASE_URL || "",
+		url: urls.property.propertyList,
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem("token")}`,
+		},
+		responseType: "blob",
 		params,
 	});
 }

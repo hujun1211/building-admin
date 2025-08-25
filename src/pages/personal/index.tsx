@@ -97,7 +97,6 @@ export default function PersonalPage() {
 		if (!username) {
 			return;
 		}
-
 		updatePasswordMutate(
 			{ username, newPassword },
 			{
@@ -125,20 +124,13 @@ export default function PersonalPage() {
 				<span>角色：</span>
 				<span>{userInfo?.role_list.toString()}</span>
 			</div>
-			<div className="mt-5">
-				<span>邮箱：</span>
-				<span>{userInfo?.mail}</span>
-			</div>
-			<div className="mt-5">
+			<div className="flex gap-5 mt-10">
 				<Button
 					className="cursor-pointer"
-					variant="link"
 					onClick={() => setDialogOpen(true)}
 				>
 					修改密码
 				</Button>
-			</div>
-			<div className="mt-5">
 				<Button className="cursor-pointer" onClick={handleLogout}>
 					退出登陆
 				</Button>

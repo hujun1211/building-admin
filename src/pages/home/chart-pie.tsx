@@ -28,8 +28,6 @@ export function ChartPie({
 		fill: chartConfig[item.kind]?.color || "#8884d8",
 	}));
 
-	console.log(chartData);
-
 	return (
 		<ChartContainer config={chartConfig || {}}>
 			<PieChart className="mt-5" margin={{ top: 20 }}>

@@ -1,4 +1,4 @@
-import AccountManagement from "@/pages/account-management";
+import Account from "@/pages/account";
 import Control from "@/pages/control";
 import Home from "@/pages/home";
 import Log from "@/pages/log";
@@ -7,7 +7,7 @@ import Property from "@/pages/property";
 import Realtime from "@/pages/realtime";
 import Role from "@/pages/role";
 import Settings from "@/pages/settings";
-import TeachingResearch from "@/pages/teaching-research";
+import Teaching from "@/pages/teaching";
 
 const sidebarItems = [
 	{
@@ -41,12 +41,6 @@ const sidebarItems = [
 		element: <Log />,
 	},
 	{
-		title: "教学科研",
-		path: "/teaching-research",
-		icon: "book",
-		element: <TeachingResearch />,
-	},
-	{
 		title: "角色管理",
 		path: "/role",
 		icon: "users",
@@ -56,7 +50,7 @@ const sidebarItems = [
 		title: "账号管理",
 		path: "/account",
 		icon: "user-round",
-		element: <AccountManagement />,
+		element: <Account />,
 	},
 	{
 		title: "个人中心",

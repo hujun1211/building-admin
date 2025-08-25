@@ -27,15 +27,16 @@ export const urls = {
 	account: {
 		accountTableList: combineAuthorityUrl("/authority/user/query/approved"),
 		roleUserList: combineAuthorityUrl("/authority/manager/role/user/list"),
+		accountCreate: combineAuthorityUrl("/authority/user/create"),
+		accountDelete: combineAuthorityUrl("/authority/user/delete"),
+		accountPasswordReset: combineAuthorityUrl("/authority/user/password/reset"),
+		// 没做完
 		accountPermission: combineAuthorityUrl(
 			"/authority/manager/permission/builder/list/task/all",
 		),
-		accountCreate: combineAuthorityUrl("/authority/user/create"),
 		accountRoleUpdate: combineAuthorityUrl(
 			"/authority/manager/role/user/update",
 		),
-		accountDelete: combineAuthorityUrl("/authority/user/delete"),
-		accountPasswordReset: combineAuthorityUrl("/authority/user/password/reset"),
 	},
 
 	// 角色
