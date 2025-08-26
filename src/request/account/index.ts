@@ -1,5 +1,3 @@
-import { s } from "node_modules/react-router/dist/development/components-CuPfnyiZ.d.mts";
-import type { P } from "node_modules/react-router/dist/development/context-DohQKLID.d.mts";
 import request from "@/request";
 import type { RoleUser } from "@/request/role";
 import { urls } from "@/request/urls";

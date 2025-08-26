@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Popconfirm, Table } from "antd";
 import { X } from "lucide-react";
-import { aw } from "node_modules/react-router/dist/development/context-DohQKLID.d.mts";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
