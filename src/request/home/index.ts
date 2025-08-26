@@ -33,14 +33,6 @@ export type OutLineInfoResponse = {
 	}[];
 };
 
-export function getOutLineInfo(): Promise<OutLineInfoResponse> {
-	return request.get(urls.home.getOutLineInfo);
-}
-
-export function getAlarmInfo(): Promise<AlarmItem[]> {
-	return request.get(urls.home.alarm);
-}
-
 interface getLivenessCountListParams {
 	end_time?: string;
 	time_unit?: string;
@@ -50,6 +42,17 @@ interface getLivenessCountListResponse {
 	times: string[];
 }
 
+// 概览
+export function getOutLineInfo(): Promise<OutLineInfoResponse> {
+	return request.get(urls.home.getOutLineInfo);
+}
+
+// 预警信息
+export function getAlarmInfo(): Promise<AlarmItem[]> {
+	return request.get(urls.home.alarm);
+}
+
+// 活跃设备数量趋势折线图
 export function getLivenessCountList(
 	params: getLivenessCountListParams,
 ): Promise<getLivenessCountListResponse> {

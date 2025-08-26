@@ -12,15 +12,14 @@ import { ChartPie } from "./chart-pie";
 import { BuildingTable } from "./table";
 
 export default function HomePage() {
+	// 设备信息概览
 	const { data: outlineInfo } = useQuery({
 		queryKey: ["getOutLineInfo"],
 		queryFn: getOutLineInfo,
 	});
 	const { device_unit, alarm_unit, property_unit, building_property_unit, sensor_kind_unit } = outlineInfo || {}
 
-	const [lineChartType, setLineChartType] = useState<"daily" | "week" | "month">(
-		"daily",
-	);
+	// 预警信息
 	const { data: alarmInfo } = useQuery({
 		queryKey: ["alarm"],
 		queryFn: getAlarmInfo,
@@ -32,26 +31,33 @@ export default function HomePage() {
 		queryFn: getTaskInterVal,
 	});
 
+	// 折线图类型切换
+	const [lineChartType, setLineChartType] = useState<"daily" | "week" | "month">(
+		"daily",
+	);
+
 	return (
 		<div className="p-5">
 			<div className="gap-5 grid grid-cols-3">
 				<Card className="border-gray-100/50 w-full h-35">
-					<CardContent>
+					<CardContent className="space-y-5">
 						<div className="flex justify-between items-center">
 							<div className="text-gray-500 text-xl">在线设备</div>
 							<div
-								className={`flex items-center text-sm ${device_unit?.trend === "decrease" ? "text-green-500" : "text-red-500"}`}
+								className={`flex items-center ${device_unit?.trend === "decrease" ? "text-green-500" : "text-red-500"}`}
 							>
-								{device_unit?.trend === "decrease" ? (
-									<ArrowDown className="mr-1" />
-								) : (
-									<ArrowUp className="mr-1" />
-								)}
-								<span>{device_unit?.trend_count}%</span>
-								<span className="ml-2">较昨日</span>
+								<span>
+									{device_unit?.trend === "decrease" ? (
+										<ArrowDown size={24} />
+									) : (
+										<ArrowUp size={24} />
+									)}
+								</span>
+								<span className="text-xl">{device_unit?.trend_count}%</span>
+								<span className="ml-2 text-sm">较昨日</span>
 							</div>
 						</div>
-						<div className="mt-5 font-semibold text-4xl">
+						<div className="font-semibold text-4xl">
 							{device_unit?.count}
 						</div>
 					</CardContent>
@@ -61,15 +67,15 @@ export default function HomePage() {
 						<div className="flex justify-between items-center">
 							<div className="text-gray-500 text-xl">预警数量</div>
 							<div
-								className={`flex items-center text-sm ${alarm_unit?.trend === "decrease" ? "text-green-500" : "text-red-500"}`}
+								className={`flex items-center ${alarm_unit?.trend === "decrease" ? "text-green-500" : "text-red-500"}`}
 							>
 								{alarm_unit?.trend === "decrease" ? (
-									<ArrowDown className="mr-1" />
+									<ArrowDown size={24} />
 								) : (
-									<ArrowUp className="mr-1" />
+									<ArrowUp size={24} />
 								)}
-								<span>{alarm_unit?.trend_count}%</span>
-								<span className="ml-2">较昨日</span>
+								<span className="text-xl">{alarm_unit?.trend_count}%</span>
+								<span className="ml-2 text-sm">较昨日</span>
 							</div>
 						</div>
 						<div className="mt-5 font-semibold text-4xl">

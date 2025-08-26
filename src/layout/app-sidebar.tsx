@@ -4,7 +4,6 @@ import { ChevronsUpDown, LogOut, User2 } from "lucide-react";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { toast } from "sonner";
 import type { UserInfo } from "@/request/authority";
 import { logout, tokenValidate } from "@/request/authority";
 import { cn } from "@/shadcn/lib/utils";
@@ -36,6 +35,7 @@ export function AppSidebar() {
 	const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 	const navigate = useNavigate();
 
+	// 检查 token 是否有效
 	const { mutate: tokenValidateMutate } = useMutation({
 		mutationFn: tokenValidate,
 	});
@@ -43,14 +43,15 @@ export function AppSidebar() {
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 
+		// 没有token
 		if (!token) {
 			navigate("/login");
 			return;
 		}
-
 		tokenValidateMutate(undefined, {
 			onSuccess: (data) => {
 				if (data?.isValid) {
+					// token 有效，设置用户信息
 					const decoded = jwtDecode(token);
 					setUserInfo(decoded as UserInfo);
 				} else {
@@ -63,6 +64,7 @@ export function AppSidebar() {
 		});
 	}, []);
 
+	// 退出登录
 	const { mutate: logoutMutate } = useMutation({
 		mutationFn: logout,
 	});

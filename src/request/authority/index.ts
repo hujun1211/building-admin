@@ -9,16 +9,13 @@ export interface UserInfo {
 	tool_list: string[];
 }
 
-// 登录
 interface LoginParams {
 	username: string;
 	password: string;
 }
-export interface LoginResponse {
-	token: string;
-	tokenInfo: any;
-}
-export function login(data: LoginParams): Promise<LoginResponse> {
+
+// 登录
+export function login(data: LoginParams): Promise<{ token: string }> {
 	return request.post(urls.authority.login, data);
 }
 
