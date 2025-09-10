@@ -4,9 +4,7 @@ import { urls } from "@/request/urls";
 export interface UserInfo {
 	username: string;
 	remark_name: string;
-	mail: string;
 	role_list: string[];
-	tool_list: string[];
 }
 
 interface LoginParams {

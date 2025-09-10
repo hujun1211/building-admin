@@ -55,6 +55,7 @@ export function AppSidebar() {
 					const decoded = jwtDecode(token);
 					setUserInfo(decoded as UserInfo);
 				} else {
+					// token 无效
 					navigate("/login");
 				}
 			},
@@ -134,10 +135,7 @@ export function AppSidebar() {
 									<DropdownMenuItem>
 										<div className="flex items-center gap-5">
 											<User2 className="inline" />
-											<div>
-												<div className="font-bold">{userInfo?.remark_name}</div>
-												<div>{userInfo?.mail}</div>
-											</div>
+											<div className="font-bold">{userInfo?.remark_name}</div>
 										</div>
 									</DropdownMenuItem>
 									<DropdownMenuSeparator />

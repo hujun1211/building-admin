@@ -5,7 +5,6 @@ import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
-import type { LoginResponse } from "@/request/authority";
 import { login } from "@/request/authority";
 
 const formSchema = z.object({
@@ -25,6 +24,7 @@ export default function LoginPage() {
 		mutationFn: login,
 	});
 
+	// 登录表单
 	const {
 		control,
 		handleSubmit,
@@ -40,7 +40,7 @@ export default function LoginPage() {
 	// 提交表单
 	function onSubmit(values: z.infer<typeof formSchema>) {
 		mutate(values, {
-			onSuccess: (data: LoginResponse) => {
+			onSuccess: (data) => {
 				localStorage.setItem("token", data.token);
 				navigate("/");
 			},
@@ -90,7 +90,12 @@ export default function LoginPage() {
 					</Form.Item>
 
 					<Form.Item>
-						<Button className="mt-5 w-full h-9! text-base!" loading={isPending} type="primary" htmlType="submit">
+						<Button
+							className="mt-5 w-full h-9! text-base!"
+							loading={isPending}
+							type="primary"
+							htmlType="submit"
+						>
 							提交
 						</Button>
 					</Form.Item>

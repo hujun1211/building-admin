@@ -1,5 +1,3 @@
-import { add } from "date-fns";
-
 function combineAuthorityUrl(url: string) {
 	return `${import.meta.env.VITE_BASE_URL}${url}`;
 }
@@ -14,13 +12,6 @@ export const urls = {
 		login: combineAuthorityUrl("/authority/manage/user/login"),
 		logout: combineAuthorityUrl("/authority/manage/user/logout"),
 		tokenValidate: combineAuthorityUrl("/authority/token/validate"),
-	},
-
-	// 首页
-	home: {
-		getOutLineInfo: combineUrl("/homepage/get_outline_info"),
-		alarm: combineUrl("/homepage/get_alarm_info"),
-		getLivenessCountList: combineUrl("/homepage/get_liveness_count_list"),
 	},
 
 	// 账号（用户）
@@ -52,6 +43,13 @@ export const urls = {
 		rolePermissionUpdate: combineAuthorityUrl(
 			"/authority/manager/permission/role/update",
 		),
+	},
+
+	// 首页
+	home: {
+		getOutLineInfo: combineUrl("/homepage/get_outline_info"),
+		alarm: combineUrl("/homepage/get_alarm_info"),
+		getLivenessCountList: combineUrl("/homepage/get_liveness_count_list"),
 	},
 
 	// 楼宇资产
@@ -95,12 +93,6 @@ export const urls = {
 		getSensorList: combineUrl("/rtdpage/search_info"),
 	},
 
-	// 系统设置
-	settings: {
-		getTaskInterVal: combineUrl("/setpage/get_liveness_task_interval"),
-		setTaskInterVal: combineUrl("/setpage/set_liveness_task_interval"),
-	},
-
 	// 日志
 	log: {
 		getLogList: combineUrl("/logpage/search_info"),
@@ -111,5 +103,11 @@ export const urls = {
 		updateThresholdRule: combineUrl("/controlpage/threshold/update"),
 
 		getThresholdRuleDetails: combineUrl("/controlpage/threshold/get"),
+	},
+
+	// 系统设置
+	settings: {
+		getTaskInterVal: combineUrl("/setpage/get_liveness_task_interval"),
+		setTaskInterVal: combineUrl("/setpage/set_liveness_task_interval"),
 	},
 };

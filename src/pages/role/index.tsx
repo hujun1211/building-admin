@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { TreeDataNode } from "antd";
-import { Popconfirm, Table, Tree } from "antd";
+import { Button, Form, Input, Modal, Popconfirm, Table, Tag, Tree } from "antd";
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useId, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import type { RoleTableResponse, RoleUser } from "@/request/role";
@@ -16,26 +16,12 @@ import {
 	updateRole,
 	updateRolePermission,
 } from "@/request/role";
-import { Badge } from "@/shadcn/ui/badge";
-import { Button } from "@/shadcn/ui/button";
-import {
-	Dialog,
-	DialogClose,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/shadcn/ui/dialog";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "@/shadcn/ui/form";
-import { Input } from "@/shadcn/ui/input";
 import type { PaginationType } from "@/types";
+
+const roleFormSchema = z.object({
+	roleName: z.string().min(1, "不能为空"),
+	description: z.string().min(1, "不能为空"),
+});
 
 export default function RolePage() {
 	// 定义表格列
@@ -57,13 +43,16 @@ export default function RolePage() {
 			dataIndex: "permission",
 			key: "permission",
 			align: "center",
+			width: 600,
+			textWrap: 'word-break',
+			ellipsis: true,
 			render: (_: any, record: RoleUser) => {
 				const rolePermissionList = rolePermissionMap[record.roleName];
 				if (rolePermissionList) {
 					return (
-						<div className="flex justify-center gap-2">
-							{rolePermissionList.map((rolePermission: string, index) => (
-								<Badge key={index}>{roleKeyMap[rolePermission]}</Badge>
+						<div className="flex gap-2">
+							{rolePermissionList.map((rolePermission: string) => (
+								<Tag color="blue" key={rolePermission}>{roleKeyMap[rolePermission]}</Tag>
 							))}
 						</div>
 					);
@@ -77,7 +66,7 @@ export default function RolePage() {
 			key: "action",
 			align: "center",
 			render: (_: any, record: RoleUser) => (
-				<div>
+				<div className="space-x-2">
 					<Button
 						variant="link"
 						className="text-blue-500 cursor-pointer"
@@ -99,6 +88,7 @@ export default function RolePage() {
 			),
 		},
 	];
+
 	// 分页
 	const [pageParams, setPageParams] = useState<PaginationType>({
 		current: 1,
@@ -111,12 +101,12 @@ export default function RolePage() {
 
 	// 表格请求
 	const {
-		isPending: tablePending,
+		isPending,
 		isRefetching,
-		data: tableData,
-		refetch: tableRefetch,
+		data: roleTableList,
+		refetch,
 	} = useQuery({
-		queryKey: ["roleTableList", pageParams?.current, pageParams?.pageSize],
+		queryKey: ["roleTableList", pageParams],
 		queryFn: () =>
 			getRoleTableList({
 				currentPage: pageParams.current,
@@ -126,22 +116,22 @@ export default function RolePage() {
 	});
 	// 设置分页
 	useEffect(() => {
-		if (isRefetching && tableData) {
+		if (isRefetching && roleTableList) {
 			setPageParams({
 				...pageParams,
-				total: tableData.roleList.total,
+				total: roleTableList.roleList.total,
 			});
-			getRolePermissionMap(tableData);
+			getRolePermissionMap(roleTableList);
 		}
-		if (!isRefetching && tableData) {
+		if (!isRefetching && roleTableList) {
 			setPageParams({
 				...pageParams,
-				total: tableData.roleList.total,
+				total: roleTableList.roleList.total,
 			});
-			getRolePermissionMap(tableData);
+			getRolePermissionMap(roleTableList);
 			getRolePermissionKeyMap();
 		}
-	}, [tableData, isRefetching]);
+	}, [roleTableList, isRefetching]);
 
 	// 角色权限
 	const { mutate: roleUserMutate, mutateAsync: roleUserMutateAsync } =
@@ -149,18 +139,18 @@ export default function RolePage() {
 			mutationFn: getRolePermission,
 		});
 
-	// 获取权限的keyMap
+	// 获取权限keyMap和权限树
+	// 权限的keyMap
 	const [roleKeyMap, setRoleKeyMap] = useState<Record<string, string>>({});
 	// 表单权限树
 	const [rolePermissionTreeData, setRolePermissionTreeData] = useState<
 		TreeDataNode[]
 	>([]);
-
 	function getRolePermissionKeyMap() {
 		roleUserMutate("", {
 			onSuccess: (res) => {
 				setRoleKeyMap(res.keyMap);
-				setRolePermissionTreeData(res?.data[0]?.children);
+				setRolePermissionTreeData(res?.data[0]?.children as TreeDataNode[]);
 			},
 		});
 	}
@@ -191,19 +181,21 @@ export default function RolePage() {
 		deleteRoleMutate(roleName, {
 			onSuccess: () => {
 				toast.success("删除成功");
-				tableRefetch();
+				refetch();
 			},
 		});
 	}
 
-	// 打开Dialog
-	const [addOrUpdate, setAddOrUpdate] = useState("add");
+	// 弹窗
+	const [dialogFlag, setDialogFlag] = useState<"add" | "edit">("add");
 	const [dialogOpen, setDialogOpen] = useState(false);
+	const formID = useId();
 
+	// 关闭弹窗时清空表单
 	function onDialogOpenChange(open: boolean) {
 		setDialogOpen(open);
 		if (!open) {
-			roleForm.reset({
+			reset({
 				roleName: "",
 				description: "",
 			});
@@ -212,11 +204,12 @@ export default function RolePage() {
 	}
 
 	// 表单
-	const roleFormSchema = z.object({
-		roleName: z.string().min(1, "不能为空"),
-		description: z.string().min(1, "不能为空"),
-	});
-	const roleForm = useForm<z.infer<typeof roleFormSchema>>({
+	const {
+		handleSubmit,
+		control,
+		formState: { errors },
+		reset,
+	} = useForm<z.infer<typeof roleFormSchema>>({
 		resolver: zodResolver(roleFormSchema),
 		defaultValues: {
 			roleName: "",
@@ -228,19 +221,22 @@ export default function RolePage() {
 	const { mutateAsync: addRoleMutate } = useMutation({
 		mutationFn: addRole,
 	});
-	function handleOpenAddDialog() {
-		setAddOrUpdate("add");
-		setDialogOpen(true);
-	}
-
 	// 更新角色
 	const { mutateAsync: updateRoleMutate } = useMutation({
 		mutationFn: updateRole,
 	});
-	function handleOpenUpdateDialog(record: any) {
-		setAddOrUpdate("update");
+
+	// 新增弹窗
+	function handleOpenAddDialog() {
+		setDialogFlag("add");
 		setDialogOpen(true);
-		roleForm.reset(record);
+	}
+
+	// 编辑弹窗
+	function handleOpenUpdateDialog(record: RoleUser) {
+		setDialogFlag("edit");
+		setDialogOpen(true);
+		reset(record);
 		setCheckedKeys(rolePermissionMap[record.roleName]);
 	}
 
@@ -250,9 +246,6 @@ export default function RolePage() {
 	});
 
 	// 提交表单
-	function handleOK() {
-		roleForm.handleSubmit(onSubmit)();
-	}
 	async function onSubmit(values: z.infer<typeof roleFormSchema>) {
 		const buildingMenuPermissions = checkedKeys.map((value) => {
 			return {
@@ -262,7 +255,7 @@ export default function RolePage() {
 			};
 		});
 
-		if (addOrUpdate === "add") {
+		if (dialogFlag === "add") {
 			await addRoleMutate(values);
 			await updateRolePermissionMutate({
 				roleName: values.roleName,
@@ -277,8 +270,8 @@ export default function RolePage() {
 			});
 			setDialogOpen(false);
 			toast.success("新增成功");
-			roleForm.reset();
-			tableRefetch();
+			reset();
+			refetch();
 		}
 		else {
 			await updateRoleMutate(values);
@@ -295,8 +288,8 @@ export default function RolePage() {
 			});
 			setDialogOpen(false);
 			toast.success("更新成功");
-			roleForm.reset();
-			tableRefetch();
+			reset();
+			refetch();
 		}
 	}
 
@@ -317,7 +310,7 @@ export default function RolePage() {
 		<div className="p-5">
 			<div className="mt-5">
 				<Button
-					className="cursor-pointer"
+					type="primary"
 					onClick={handleOpenAddDialog}
 				>
 					新增
@@ -326,81 +319,86 @@ export default function RolePage() {
 
 			<Table
 				columns={columns}
-				dataSource={tableData?.roleList.records}
-				loading={tablePending}
+				dataSource={roleTableList?.roleList.records}
+				loading={isPending}
 				pagination={pageParams}
 				onChange={handlePaginationChange}
 			/>
 
-			<Dialog open={dialogOpen} onOpenChange={onDialogOpenChange}>
-				<DialogContent className="max-w-180!" showCloseButton={false}>
-					<DialogClose className="top-3 right-3 absolute flex justify-center items-center bg-gray-200 hover:bg-gray-300 p-1 rounded-full cursor-pointer">
-						<X className="w-4 h-4" />
-					</DialogClose>
-					<DialogHeader>
-						{addOrUpdate === "add" ? (
-							<DialogTitle>新增角色</DialogTitle>
-						) : (
-							<DialogTitle>更新角色</DialogTitle>
-						)}
-					</DialogHeader>
-					<div className="mt-5">
-						<Form {...roleForm}>
-							<form className="space-y-7">
-								<FormField
-									control={roleForm.control}
-									name="roleName"
-									render={({ field }) => (
-										<FormItem className="relative flex items-center gap-5">
-											<FormLabel>角色名称</FormLabel>
-											<div className="flex flex-col">
-												<FormControl>
-													<Input {...field} className="w-80 h-8" />
-												</FormControl>
-												<FormMessage className="bottom-0 absolute translate-y-full" />
-											</div>
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={roleForm.control}
-									name="description"
-									render={({ field }) => (
-										<FormItem className="relative flex items-center gap-5">
-											<FormLabel>角色描述</FormLabel>
-											<div className="flex flex-col">
-												<FormControl>
-													<Input {...field} className="w-80 h-8" />
-												</FormControl>
-												<FormMessage className="bottom-0 absolute translate-y-full" />
-											</div>
-										</FormItem>
-									)}
-								/>
-								<Tree
-									checkable
-									treeData={rolePermissionTreeData}
-									onExpand={onExpand}
-									expandedKeys={expandedKeys}
-									autoExpandParent={autoExpandParent}
-									checkedKeys={checkedKeys}
-									onCheck={onCheck}
-								/>
-							</form>
-						</Form>
+			<Modal
+				className="w-200!"
+				centered
+				title={dialogFlag === "add" ? "新增角色" : "编辑角色"}
+				open={dialogOpen}
+				onCancel={() => onDialogOpenChange(false)}
+				footer={[
+					<Button
+						key={"cancel"}
+						onClick={() => onDialogOpenChange(false)}
+					>
+						取消
+					</Button>,
+					<Button
+						key={"submit"}
+						type="primary"
+						htmlType="submit"
+						form={formID}
+					>
+						确定
+					</Button>,
+				]}
+			>
+				<div className="mt-5">
+					<Form
+						layout="horizontal"
+						id={formID}
+						onFinish={handleSubmit(onSubmit)}
+					>
+						<Form.Item
+							label="角色名称"
+							required
+							validateStatus={errors.roleName ? "error" : ""}
+							help={errors.roleName?.message}
+						>
+							<Controller
+								name="roleName"
+								control={control}
+								render={({ field }) => (
+									<Input {...field} allowClear placeholder="请输入角色名称" />
+								)}
+							/>
+						</Form.Item>
+						<Form.Item
+							label="角色描述"
+							required
+							validateStatus={errors.description ? "error" : ""}
+							help={errors.description?.message}
+						>
+							<Controller
+								name="description"
+								control={control}
+								render={({ field }) => (
+									<Input {...field} allowClear placeholder="请输入角色描述" />
+								)}
+							/>
+						</Form.Item>
+					</Form>
+					<div>
+						<div>角色权限：</div>
+						<div className="mt-2">
+							<Tree
+								checkable
+								treeData={rolePermissionTreeData}
+								onExpand={onExpand}
+								expandedKeys={expandedKeys}
+								autoExpandParent={autoExpandParent}
+								checkedKeys={checkedKeys}
+								onCheck={onCheck}
+							/>
+						</div>
 					</div>
-					<DialogFooter className="mt-10">
-						<DialogClose asChild>
-							<Button variant="outline" className="cursor-pointer">
-								取消
-							</Button>
-						</DialogClose>
-						<Button type="button" className="cursor-pointer" onClick={handleOK}>
-							确定
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+				</div>
+			</Modal>
 		</div>
 	);
 }

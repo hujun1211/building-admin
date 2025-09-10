@@ -46,6 +46,8 @@ import {
 import type { PaginationType } from "@/types";
 
 export default function AccountPage() {
+
+	// 表格列
 	const columns = [
 		{
 			title: "账号名称",
@@ -57,12 +59,6 @@ export default function AccountPage() {
 			title: "账号别名",
 			dataIndex: "remarkName",
 			key: "remarkName",
-			align: "center",
-		},
-		{
-			title: "登录手机",
-			dataIndex: "phone",
-			key: "phone",
 			align: "center",
 		},
 		{
@@ -97,6 +93,12 @@ export default function AccountPage() {
 						className="text-blue-500 cursor-pointer"
 					>
 						重置密码
+					</Button>
+					<Button
+						variant="link"
+						className="text-blue-500 cursor-pointer"
+					>
+						编辑
 					</Button>
 					<Popconfirm
 						title="确定删除这个角色吗?"
@@ -152,9 +154,7 @@ export default function AccountPage() {
 		mutationFn: (username: string) => getRoleUserList(username),
 	});
 	// 账号角色
-	const [userRoleMap, setUserRoleMap] = useState<Record<string, RoleUser[]>>(
-		{},
-	);
+	const [userRoleMap, setUserRoleMap] = useState<Record<string, RoleUser[]>>({});
 	async function getUserRoleMap(tableData: AccountTableListResponse) {
 		const newMap: Record<string, RoleUser[]> = {};
 		const promises = tableData.userInfoList.map(async (userInfo) => {
